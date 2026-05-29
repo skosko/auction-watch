@@ -110,7 +110,8 @@ def cli():
         )
 
     cat = cat_image_url() if not lots else None
-    html = render_digest(lots, cat_image_url=cat)
+    artist_slugs = {a.name: a.slug for a in artists}
+    html = render_digest(lots, cat_image_url=cat, artist_slugs=artist_slugs)
 
     out = Path("last_digest.html")
     out.write_text(html, encoding="utf-8")

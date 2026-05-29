@@ -26,7 +26,11 @@ def _format_estimate(lot: Lot) -> str:
 _env.filters["estimate"] = _format_estimate
 
 
-def render_digest(lots: list[Lot], cat_image_url: str | None = None) -> str:
+def render_digest(
+    lots: list[Lot],
+    cat_image_url: str | None = None,
+    artist_slugs: dict[str, str] | None = None,
+) -> str:
     template = _env.get_template("email.html.j2")
 
     def _sort_key(lot: Lot):
@@ -39,4 +43,5 @@ def render_digest(lots: list[Lot], cat_image_url: str | None = None) -> str:
         lots=sorted(lots, key=_sort_key),
         generated_at=datetime.now(timezone.utc),
         cat_image_url=cat_image_url,
+        artist_slugs=artist_slugs or {},
     )
