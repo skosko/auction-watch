@@ -174,19 +174,12 @@ async def _search_artist_pw(page, artist: Artist) -> list[Lot]:
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
-    try:
-        from playwright.async_api import async_playwright
-    except ImportError:
-        log.warning("1stdibs: playwright not installed, skipping")
-        return []
-
-    from ._playwright_utils import new_browser_context
+    from ._playwright_utils import camoufox_context
 
     sem = asyncio.Semaphore(CONCURRENCY)
     all_lots: list[Lot] = []
 
-    async with async_playwright() as p:
-        browser, context = await new_browser_context(p)
+    async with camoufox_context() as (browser, context):
 
         async def _one(artist: Artist) -> list[Lot]:
             async with sem:

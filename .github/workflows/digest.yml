@@ -22,6 +22,9 @@ jobs:
       - name: Install Playwright browsers
         run: uv run playwright install chromium --with-deps
 
+      - name: Install Camoufox browser
+        run: uv run python -m camoufox fetch
+
       - name: Run auction-watch
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

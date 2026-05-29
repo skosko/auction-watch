@@ -14,7 +14,7 @@ import re
 import unicodedata
 from datetime import datetime, timezone
 
-import httpx
+from curl_cffi.requests import AsyncSession
 
 from ..artists import Artist
 from ..models import Lot
@@ -24,10 +24,6 @@ log = logging.getLogger(__name__)
 name = "bonhams"
 
 SEARCH_URL = "https://www.bonhams.com/search/"
-USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
-)
 NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', re.DOTALL
 )
@@ -101,14 +97,14 @@ def _lot_to_model(raw: dict, artist_name: str) -> Lot | None:
     )
 
 
-async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]:
+async def _search_artist(session: AsyncSession, artist: Artist) -> list[Lot]:
     try:
-        r = await client.get(
+        r = await session.get(
             SEARCH_URL,
             params={"q": artist.name, "isUpcoming": "true"},
-            headers={"User-Agent": USER_AGENT},
             timeout=20.0,
-            follow_redirects=True,
+            allow_redirects=True,
+            impersonate="chrome124",
         )
         r.raise_for_status()
     except Exception as e:
@@ -146,12 +142,13 @@ async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]
     return lots
 
 
-async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
+async def collect(client, artists: list[Artist]) -> list[Lot]:
     sem = asyncio.Semaphore(CONCURRENCY)
 
-    async def _one(a: Artist) -> list[Lot]:
-        async with sem:
-            return await _search_artist(client, a)
+    async with AsyncSession() as session:
+        async def _one(a: Artist) -> list[Lot]:
+            async with sem:
+                return await _search_artist(session, a)
 
-    results = await asyncio.gather(*(_one(a) for a in artists))
+        results = await asyncio.gather(*(_one(a) for a in artists))
     return [lot for sub in results for lot in sub]

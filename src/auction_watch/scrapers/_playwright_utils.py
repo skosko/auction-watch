@@ -4,6 +4,7 @@ Shared Playwright helpers used by scrapers that require a real browser.
 
 import asyncio
 import logging
+from contextlib import asynccontextmanager
 from typing import Any
 
 log = logging.getLogger(__name__)
@@ -33,6 +34,24 @@ async def new_browser_context(playwright: Any):
         timezone_id="America/New_York",
     )
     return browser, context
+
+
+@asynccontextmanager
+async def camoufox_context():
+    """Launch a camoufox (anti-detect Firefox) browser and yield (browser, context).
+
+    Preferred over Playwright+Chromium for sites protected by Cloudflare Bot Management,
+    since camoufox patches Firefox at the C++ level and reports 0% headless detection.
+    """
+    from camoufox.async_api import AsyncCamoufox
+
+    async with AsyncCamoufox(headless=True) as browser:
+        context = await browser.new_context(
+            viewport=VIEWPORT,
+            locale="en-US",
+            timezone_id="America/New_York",
+        )
+        yield browser, context
 
 
 async def wait_for_content(page: Any, timeout: float = 12000) -> None:

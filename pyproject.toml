@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Weekly digest of upcoming auction lots for followed artists"
 requires-python = ">=3.12"
 dependencies = [
+    "camoufox[geoip]>=0.4",
+    "curl-cffi>=0.7",
     "httpx>=0.27",
     "jinja2>=3.1",
     "playwright>=1.60.0",
