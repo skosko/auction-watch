@@ -1,0 +1,24 @@
+[project]
+name = "auction-watch"
+version = "0.1.0"
+description = "Weekly digest of upcoming auction lots for followed artists"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.27",
+    "jinja2>=3.1",
+    "playwright>=1.60.0",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "resend>=2.0",
+]
+
+[project.scripts]
+auction-watch = "auction_watch.main:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/auction_watch"]

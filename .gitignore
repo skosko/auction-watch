@@ -1,0 +1,9 @@
+.env
+.DS_Store
+last_digest.html
+state.db
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/

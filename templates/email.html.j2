@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auction Watch</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f2;padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #eaeaea;">
+        <tr>
+          <td style="padding:28px 32px 18px 32px;border-bottom:1px solid #eaeaea;">
+            <h1 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.01em;">Auction Watch</h1>
+            <p style="margin:6px 0 0;font-size:13px;color:#777;">
+              {{ generated_at.strftime('%A, %B %-d, %Y') }}
+              {% if lots %}· {{ lots|length }} lot{{ '' if lots|length == 1 else 's' }} closing in the next 90 days{% endif %}
+            </p>
+          </td>
+        </tr>
+
+        {% if lots %}
+          {% for lot in lots %}
+          <tr>
+            <td style="padding:20px 32px;border-bottom:1px solid #eee;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  {% if lot.image_url %}
+                  <td width="120" valign="top" style="padding-right:16px;">
+                    <a href="{{ lot.url }}" style="text-decoration:none;">
+                      <img src="{{ lot.image_url }}" alt="" width="120" style="display:block;border-radius:4px;background:#f0f0f0;">
+                    </a>
+                  </td>
+                  {% endif %}
+                  <td valign="top">
+                    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.06em;">
+                      {{ lot.artist }}{% if lot.is_new %}<span style="color:#ffffff;background:#d4541a;padding:1px 6px;border-radius:3px;font-size:10px;margin-left:8px;letter-spacing:0.04em;">NEW</span>{% endif %}
+                    </div>
+                    <div style="font-size:16px;font-weight:500;margin:4px 0 8px;line-height:1.3;">
+                      <a href="{{ lot.url }}" style="color:#1a1a1a;text-decoration:none;">{{ lot.title }}</a>
+                    </div>
+                    <div style="font-size:13px;color:#555;">{{ lot.house }}</div>
+                    <div style="font-size:13px;color:#555;margin-top:2px;">{{ lot|estimate }}</div>
+                    <div style="font-size:13px;color:#d4541a;margin-top:6px;">
+                      Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td style="padding:48px 32px;text-align:center;">
+              <p style="margin:0 0 20px;font-size:15px;color:#555;">No lots matched this week. Here is a sleeping cat instead.</p>
+              {% if cat_image_url %}
+              <img src="{{ cat_image_url }}" alt="A sleeping cat" style="max-width:100%;border-radius:8px;">
+              {% endif %}
+            </td>
+          </tr>
+        {% endif %}
+
+        <tr>
+          <td style="padding:18px 32px;font-size:11px;color:#999;text-align:center;background:#fafafa;">
+            Generated locally by auction-watch
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

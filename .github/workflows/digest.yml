@@ -1,0 +1,26 @@
+name: Auction Digest
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 6am UTC = 8am CEST
+  workflow_dispatch:        # enables the "Run workflow" button
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-caching: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run auction-watch
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
+        run: uv run auction-watch

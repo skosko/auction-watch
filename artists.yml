@@ -1,0 +1,427 @@
+# Artists to watch. Edit freely — add, remove, or comment out lines.
+# `slug` is the Artsy URL slug (https://www.artsy.net/artist/<slug>).
+# `bio` is for human reference only; scrapers ignore it.
+artists:
+  - name: "Addie Wagenknecht"
+    slug: addie-wagenknecht
+    bio: "American, b. 1981"
+  - name: "Ai Weiwei"
+    slug: ai-weiwei
+    bio: "Chinese, b. 1957"
+  - name: "Albert Renger-Patzsch"
+    slug: albert-renger-patzsch
+    bio: "German, 1897–1966"
+  - name: "Alicja Kwade"
+    slug: alicja-kwade
+    bio: "Polish, b. 1979"
+  - name: "Andreas Eriksson"
+    slug: andreas-eriksson
+    bio: "Swedish, b. 1975"
+  - name: "Andreas Gursky"
+    slug: andreas-gursky
+    bio: "German, b. 1955"
+  - name: "Andy Gilmore"
+    slug: andy-gilmore
+    bio: "American"
+  - name: "Anna Uddenberg"
+    slug: anna-uddenberg
+    bio: "Swedish, b. 1982"
+  - name: "Anne Imhof"
+    slug: anne-imhof
+    bio: "German, b. 1978"
+  - name: "Anne von Freyburg"
+    slug: anne-von-freyburg
+    bio: "Dutch, b. 1979"
+  - name: "Anselm Reyle"
+    slug: anselm-reyle
+    bio: "German, b. 1970"
+  - name: "Avery Singer"
+    slug: avery-singer
+    bio: "American, b. 1987"
+  - name: "Axel Krause"
+    slug: axel-krause
+    bio: "German, b. 1958"
+  - name: "Barry McGee"
+    slug: barry-mcgee
+    bio: "American, b. 1966"
+  - name: "Bella Rune"
+    slug: bella-rune
+    bio: "Swedish, b. 1971"
+  - name: "Boris Rebetez"
+    slug: boris-rebetez
+  - name: "Bunny Rogers"
+    slug: bunny-rogers
+    bio: "American, b. 1990"
+  - name: "Carl Grossberg"
+    slug: carl-grossberg
+    bio: "German, 1894–1940"
+  - name: "Cerith Wyn Evans"
+    slug: cerith-wyn-evans
+    bio: "British, b. 1958"
+  - name: "Chen Wen Ling"
+    slug: chen-wen-ling
+    bio: "Chinese, b. 1969"
+  - name: "Chris Ware"
+    slug: chris-ware
+    bio: "American, b. 1967"
+  - name: "Conny Maier"
+    slug: conny-maier
+    bio: "German"
+  - name: "Cosima von Bonin"
+    slug: cosima-von-bonin
+    bio: "German, b. 1962"
+  - name: "Damien Hirst"
+    slug: damien-hirst
+    bio: "British, b. 1965"
+  - name: "Danh Vō"
+    slug: danh-vo
+    bio: "Vietnamese and Danish, b. 1975"
+  - name: "Daniel Clowes"
+    slug: daniel-clowes
+  - name: "David Cook"
+    slug: david-cook
+  - name: "Deana Lawson"
+    slug: deana-lawson
+    bio: "American, b. 1979"
+  - name: "Doppeldenk"
+    slug: doppeldenk
+    bio: "German"
+  - name: "Eberhard Havekost"
+    slug: eberhard-havekost
+    bio: "German, 1967–2019"
+  - name: "Ed Atkins"
+    slug: ed-atkins
+    bio: "British, b. 1982"
+  - name: "Emma Webster"
+    slug: emma-webster
+    bio: "British-American, b. 1989"
+  - name: "Ernie Eugene Barnes"
+    slug: ernie-eugene-barnes
+    bio: "American, 1938–2009"
+  - name: "Erwin Wurm"
+    slug: erwin-wurm
+    bio: "Austrian, b. 1954"
+  - name: "Eva and Franco Mattes"
+    slug: eva-and-franco-mattes
+    bio: "Italian, b. 1976"
+  - name: "Fabian Marti"
+    slug: fabian-marti
+    bio: "Swiss, b. 1979"
+  - name: "Florian Meisenberg"
+    slug: florian-meisenberg
+    bio: "German, b. 1980"
+  - name: "Franz Radziwill"
+    slug: franz-radziwill
+    bio: "German, 1895–1983"
+  - name: "Friedrich Kunath"
+    slug: friedrich-kunath
+    bio: "German, b. 1974"
+  - name: "George Condo"
+    slug: george-condo
+    bio: "American, b. 1957"
+  - name: "Guan Xiao"
+    slug: guan-xiao
+    bio: "Chinese, b. 1983"
+  - name: "Hans Aichinger"
+    slug: hans-aichinger
+    bio: "German, b. 1959"
+  - name: "Harun Farocki"
+    slug: harun-farocki
+    bio: "German, 1944–2014"
+  - name: "He Xiangyu"
+    slug: he-xiangyu
+    bio: "Chinese, b. 1986"
+  - name: "Helen Frankenthaler"
+    slug: helen-frankenthaler
+    bio: "American, 1928–2011"
+  - name: "Heribert C. Ottersbach"
+    slug: heribert-c-ottersbach
+    bio: "German, b. 1960"
+  - name: "Ingmar Alge"
+    slug: ingmar-alge
+    bio: "Austrian, b. 1971"
+  - name: "Jake & Dinos Chapman"
+    slug: jake-and-dinos-chapman
+    bio: "British, 1966 and 1962"
+  - name: "Jamel Shabazz"
+    slug: jamel-shabazz
+    bio: "American, b. 1960"
+  - name: "James Turrell"
+    slug: james-turrell
+    bio: "American, b. 1943"
+  - name: "Jeff Koons"
+    slug: jeff-koons
+    bio: "American, b. 1955"
+  - name: "Jeffrey Gibson"
+    slug: jeffrey-gibson
+    bio: "Native American (Mississippi Band of Choctaw, Cherokee), b. 1972"
+  - name: "Jeremy Shaw"
+    slug: jeremy-shaw
+    bio: "Canadian, b. 1977"
+  - name: "Jessie Homer French"
+    slug: jessie-homer-french
+    bio: "American, b. 1940"
+  - name: "Jill Mulleady"
+    slug: jill-mulleady
+    bio: "Argentine, b. 1980"
+  - name: "Johann König"
+    slug: johann-konig
+  - name: "Johannes Itten"
+    slug: johannes-itten
+    bio: "Swiss, 1888–1967"
+  - name: "Johannes Wohnseifer"
+    slug: johannes-wohnseifer
+    bio: "German, b. 1967"
+  - name: "Jorinde Voigt"
+    slug: jorinde-voigt
+    bio: "German, b. 1977"
+  - name: "Julian Opie"
+    slug: julian-opie
+    bio: "British, b. 1958"
+  - name: "Justin Matherly"
+    slug: justin-matherly
+    bio: "American, b. 1972"
+  - name: "Katja Novitskova"
+    slug: katja-novitskova
+    bio: "Estonian, b. 1984"
+  - name: "Kehinde Wiley"
+    slug: kehinde-wiley
+    bio: "American, b. 1977"
+  - name: "Kevin Earl Taylor"
+    slug: kevin-earl-taylor
+    bio: "American"
+  - name: "Klara Liden"
+    slug: klara-liden
+    bio: "Swedish, b. 1979"
+  - name: "Koo Jeong A"
+    slug: koo-jeong-a
+    bio: "Korean, b. 1967"
+  - name: "Kris Martin"
+    slug: kris-martin
+    bio: "Belgian, b. 1972"
+  - name: "Leigh Ruple"
+    slug: leigh-ruple
+    bio: "American, b. 1984"
+  - name: "Lukas Heerich"
+    slug: lukas-heerich
+    bio: "German, b. 1989"
+  - name: "Luzia Simons"
+    slug: luzia-simons
+    bio: "Brazilian, b. 1953"
+  - name: "Mandla Reuter"
+    slug: mandla-reuter
+    bio: "b. 1975"
+  - name: "Manfred Mohr"
+    slug: manfred-mohr
+    bio: "German, b. 1938"
+  - name: "Marcel Gähler"
+    slug: marcel-gahler
+    bio: "Swiss, b. 1967"
+  - name: "Marieta Chirulescu"
+    slug: marieta-chirulescu
+    bio: "Romanian, b. 1974"
+  - name: "Marine Hugonnier"
+    slug: marine-hugonnier
+    bio: "French, b. 1969"
+  - name: "Mario Klingemann"
+    slug: mario-klingemann
+    bio: "German, b. 1970"
+  - name: "Martin Boyce"
+    slug: martin-boyce
+    bio: "Scottish, b. 1967"
+  - name: "Massimo Vitali"
+    slug: massimo-vitali
+    bio: "Italian, b. 1944"
+  - name: "Maurizio Cattelan"
+    slug: maurizio-cattelan
+    bio: "Italian, b. 1960"
+  - name: "Maurizio Nannucci"
+    slug: maurizio-nannucci
+    bio: "Italian, b. 1939"
+  - name: "Michael Sailstorfer"
+    slug: michael-sailstorfer
+    bio: "German, b. 1979"
+  - name: "Michel Majerus"
+    slug: michel-majerus
+    bio: "Luxembourgeois, 1967–2002"
+  - name: "Mike Kelley"
+    slug: mike-kelley
+    bio: "American, 1954–2012"
+  - name: "Nadezda Nikolova"
+    slug: nadezda-nikolova
+    bio: "Yugoslav, b. 1978"
+  - name: "Neo Rauch"
+    slug: neo-rauch
+    bio: "German, b. 1960"
+  - name: "Norbert Bisky"
+    slug: norbert-bisky
+    bio: "German, b. 1970"
+  - name: "Olafur Eliasson"
+    slug: olafur-eliasson
+    bio: "Danish Icelandic, b. 1967"
+  - name: "OSGEMEOS"
+    slug: osgemeos
+    bio: "Brazilian, b. 1974"
+  - name: "Paloma Varga Weisz"
+    slug: paloma-varga-weisz
+    bio: "German, b. 1966"
+  - name: "Pamela Rosenkranz"
+    slug: pamela-rosenkranz
+    bio: "Swiss, b. 1979"
+  - name: "Parra"
+    slug: parra
+    bio: "Dutch, b. 1976"
+  - name: "Pascal Möhlmann"
+    slug: pascal-mohlmann
+  - name: "Paul Kremer"
+    slug: paul-kremer
+    bio: "American, b. 1971"
+  - name: "Paulo Nazareth"
+    slug: paulo-nazareth
+    bio: "Brazilian, b. 1977"
+  - name: "Peter Bialobrzeski"
+    slug: peter-bialobrzeski
+    bio: "German, b. 1961"
+  - name: "Pieter Schoolwerth"
+    slug: pieter-schoolwerth
+    bio: "American, b. 1970"
+  - name: "Pol Taburet"
+    slug: pol-taburet
+    bio: "French, b. 1997"
+  - name: "Ralf Peters"
+    slug: ralf-peters
+    bio: "German, b. 1960"
+  - name: "Rankin"
+    slug: rankin
+    bio: "British, b. 1966"
+  - name: "Rinus Van de Velde"
+    slug: rinus-van-de-velde
+    bio: "Belgian, b. 1983"
+  - name: "Robert Gober"
+    slug: robert-gober
+    bio: "American, b. 1954"
+  - name: "Roman Ondak"
+    slug: roman-ondak
+    bio: "Slovak, b. 1966"
+  - name: "Romuald Karmakar"
+    slug: romuald-karmakar
+    bio: "French, b. 1955"
+  - name: "Ron Mueck"
+    slug: ron-mueck
+    bio: "Australian, b. 1958"
+  - name: "Ruohan Wang 王若晗"
+    slug: ruohan-wang-wang-ruo-han
+    bio: "Chinese"
+  - name: "Ruth Wolf-Rehfeldt"
+    slug: ruth-wolf-rehfeldt
+    bio: "German, 1932–2024"
+  - name: "Ryan Mosley"
+    slug: ryan-mosley
+    bio: "British, b. 1980"
+  - name: "Saj Issa"
+    slug: saj-issa
+    bio: "b. 1994"
+  - name: "Scott Hunt"
+    slug: scott-hunt
+    bio: "American, b. 1958"
+  - name: "Sergej Jensen"
+    slug: sergej-jensen
+    bio: "Danish, b. 1973"
+  - name: "Sheila Hicks"
+    slug: sheila-hicks
+    bio: "American, b. 1934"
+  - name: "Shirley Jaffe"
+    slug: shirley-jaffe
+    bio: "American, 1923–2016"
+  - name: "Silke Otto-Knapp"
+    slug: silke-otto-knapp
+    bio: "German, b. 1970"
+  - name: "Simon Roberts"
+    slug: simon-roberts
+    bio: "British, b. 1974"
+  - name: "Stefan Kürten"
+    slug: stefan-kurten
+    bio: "German, b. 1963"
+  - name: "Stefan Marx"
+    slug: stefan-marx
+    bio: "German, b. 1979"
+  - name: "Stelios Faitakis"
+    slug: stelios-faitakis
+    bio: "Greek, b. 1976"
+  - name: "Stephen G. Rhodes"
+    slug: stephen-g-rhodes
+    bio: "American, b. 1977"
+  - name: "Sun-kyo Park"
+    slug: sun-kyo-park
+    bio: "South Korean, b. 1990"
+  - name: "Thea Djordjadze"
+    slug: thea-djordjadze
+    bio: "Georgian, b. 1971"
+  - name: "Thomas Eggerer"
+    slug: thomas-eggerer
+    bio: "German, b. 1963"
+  - name: "Thomas Ruff"
+    slug: thomas-ruff
+    bio: "German, b. 1958"
+  - name: "Thomas Scheibitz"
+    slug: thomas-scheibitz-2
+    bio: "German, b. 1968"
+  - name: "Thomas Schütte"
+    slug: thomas-schutte
+    bio: "German, b. 1954"
+  - name: "Thomas Zipp"
+    slug: thomas-zipp
+    bio: "German, b. 1966"
+  - name: "Timo von Eicken"
+    slug: timo-von-eicken
+    bio: "German, b. 1977"
+  - name: "Titus Schade"
+    slug: titus-schade
+    bio: "German, b. 1984"
+  - name: "Tobias Rehberger"
+    slug: tobias-rehberger
+    bio: "German, b. 1966"
+  - name: "Todd James"
+    slug: todd-james
+    bio: "American, b. 1969"
+  - name: "Tom Sachs"
+    slug: tom-sachs
+    bio: "American, b. 1966"
+  - name: "Tomás Saraceno"
+    slug: tomas-saraceno
+    bio: "Argentine-German, b. 1973"
+  - name: "Torsten Slama"
+    slug: torsten-slama
+    bio: "Austrian, b. 1967"
+  - name: "Toyin Ojih Odutola"
+    slug: toyin-ojih-odutola
+    bio: "Nigerian, b. 1985"
+  - name: "Uwe Henneken"
+    slug: uwe-henneken
+    bio: "German, b. 1974"
+  - name: "Vera Molnar"
+    slug: vera-molnar-1
+    bio: "Hungarian, 1924–2023"
+  - name: "Victor Man"
+    slug: victor-man
+    bio: "Romanian, b. 1974"
+  - name: "Victor Siret"
+    slug: victor-siret
+    bio: "French, b. 1998"
+  - name: "Werner Tübke"
+    slug: werner-tubke
+    bio: "German, 1929–2004"
+  - name: "Wilhelm Sasnal"
+    slug: wilhelm-sasnal
+    bio: "Polish, b. 1972"
+  - name: "Wolfgang Mattheuer"
+    slug: wolfgang-mattheuer
+  - name: "Wolfgang Tillmans"
+    slug: wolfgang-tillmans
+    bio: "German, b. 1968"
+  - name: "Yngve Holen"
+    slug: yngve-holen
+    bio: "Norwegian and German, b. 1982"
+  - name: "Yuan Jai (袁旃)"
+    slug: yuan-jai-yuan-zhan
+    bio: "b. 1941"
