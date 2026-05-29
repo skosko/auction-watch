@@ -15,7 +15,14 @@
             <h1 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.01em;">Auction Watch</h1>
             <p style="margin:6px 0 0;font-size:13px;color:#777;">
               {{ generated_at.strftime('%A, %B %-d, %Y') }}
-              {% if lots %}· {{ lots|length }} lot{{ '' if lots|length == 1 else 's' }} closing in the next 90 days{% endif %}
+              {% if lots %}
+                {%- set auction_lots = lots | selectattr('close_date') | list -%}
+                {%- set dealer_lots = lots | rejectattr('close_date') | list -%}
+                ·
+                {%- if auction_lots %} {{ auction_lots|length }} lot{{ '' if auction_lots|length == 1 else 's' }} at auction{%- endif -%}
+                {%- if auction_lots and dealer_lots %},{%- endif -%}
+                {%- if dealer_lots %} {{ dealer_lots|length }} dealer listing{{ '' if dealer_lots|length == 1 else 's' }}{%- endif %}
+              {% endif %}
             </p>
           </td>
         </tr>
@@ -43,7 +50,7 @@
                     <div style="font-size:13px;color:#555;">{{ lot.house }}</div>
                     <div style="font-size:13px;color:#555;margin-top:2px;">{{ lot|estimate }}</div>
                     <div style="font-size:13px;color:#d4541a;margin-top:6px;">
-                      Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}
+                      {% if lot.close_date %}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{% else %}Available now{% endif %}
                     </div>
                   </td>
                 </tr>

@@ -7,7 +7,7 @@ class Lot(BaseModel):
     artist: str
     title: str
     house: str
-    close_date: datetime
+    close_date: datetime | None = None  # None for dealer listings
     url: HttpUrl
     image_url: HttpUrl | None = None
     estimate_low: int | None = None

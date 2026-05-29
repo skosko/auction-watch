@@ -75,7 +75,7 @@ async def _gather_lots(artists: list[Artist]) -> list[Lot]:
 def _within_window(lots: list[Lot], days: int) -> list[Lot]:
     now = datetime.now(timezone.utc)
     cutoff = now + timedelta(days=days)
-    return [l for l in lots if now <= l.close_date <= cutoff]
+    return [l for l in lots if l.close_date is None or now <= l.close_date <= cutoff]
 
 
 def _dedupe(lots: list[Lot]) -> list[Lot]:

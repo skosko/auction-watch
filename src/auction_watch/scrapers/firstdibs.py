@@ -1,22 +1,23 @@
 """
-1stDibs scraper — luxury buy-now marketplace (1stdibs.com).
+1stDibs scraper — luxury dealer marketplace (1stdibs.com).
 
-1stDibs is primarily a dealer marketplace (fixed price / make-an-offer),
-not a traditional auction house with timed bidding. Their GraphQL search API
-returns listing items with price fields but no close dates or endDate fields.
-The /auctions/ URL redirects to the homepage and their "context=auction"
-search filter does not surface timed lots.
+1stDibs is a buy-now marketplace (fixed price / make-an-offer), not a
+traditional auction house. Lots are returned with close_date=None and
+displayed as "Available now" in the digest.
 
-Currently returns 0 lots — kept as a stub for future improvement if
-1stDibs introduces or exposes a timed-auction API.
+The site blocks plain httpx (Cloudflare), so we use Playwright to load
+one search page per artist and capture the GraphQL itemSearch response.
+
+Results are sorted by "newest" on 1stDibs so recently-listed works
+appear first. Up to MAX_PER_ARTIST results are returned per artist.
+
+Concurrency: 3 simultaneous browser pages.
 """
 
 import asyncio
 import logging
 import re
 import unicodedata
-from datetime import datetime, timezone
-from urllib.parse import quote
 
 import httpx
 
@@ -27,13 +28,10 @@ log = logging.getLogger(__name__)
 
 name = "1stdibs"
 
-SEARCH_URL = "https://www.1stdibs.com/search/"
-CONCURRENCY = 2
-
-CURRENCY_SYMBOL = {
-    "USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$",
-    "CHF": "CHF ", "JPY": "¥", "AUD": "A$", "CAD": "C$",
-}
+BASE = "https://www.1stdibs.com"
+SEARCH_BASE = f"{BASE}/search/art/"
+CONCURRENCY = 3
+MAX_PER_ARTIST = 10
 
 
 def _normalize(s: str) -> str:
@@ -42,117 +40,169 @@ def _normalize(s: str) -> str:
     return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
-def _parse_dt(s) -> datetime | None:
-    if not s:
-        return None
-    if isinstance(s, (int, float)):
-        try:
-            return datetime.fromtimestamp(s / 1000 if s > 1e10 else s, tz=timezone.utc)
-        except (OSError, OverflowError, ValueError):
-            return None
-    for fmt in (None, "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
-        try:
-            if fmt is None:
-                return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
-            return datetime.strptime(str(s), fmt).replace(tzinfo=timezone.utc)
-        except ValueError:
-            continue
-    return None
+def _preferred_price(converted: list[dict]) -> tuple[int | None, str]:
+    """Return (amount_int, currency_symbol) preferring EUR then GBP then USD."""
+    by_currency = {d["currency"]: d["amount"] for d in converted if d.get("currency")}
+    for code, symbol in (("EUR", "€"), ("GBP", "£"), ("USD", "$")):
+        if code in by_currency:
+            return int(round(by_currency[code])), symbol
+    return None, "$"
 
 
-def _gql_item_to_lot(item: dict, artist_name: str) -> Lot | None:
-    """Handle a GraphQL item node which may be a Lot or Product type."""
-    # Try lot-specific fields first
-    url = item.get("pdpUrl") or item.get("url") or item.get("href")
-    if not url:
-        return None
-    if not url.startswith("http"):
-        url = f"https://www.1stdibs.com{url}"
-
-    # Close date: lots have auctionEndDate / endDate / closingDate
-    close_raw = (
-        item.get("auctionEndDate") or item.get("endDate") or item.get("closingDate")
-        or item.get("saleDate") or item.get("date")
-    )
-    close_dt = _parse_dt(close_raw)
-    if not close_dt:
+def _item_to_lot(item: dict, artist_display: str) -> Lot | None:
+    if item.get("isSold") or item.get("isUnavailable") or item.get("isOnHold"):
         return None
 
-    title = item.get("title") or item.get("name") or item.get("description") or "Untitled"
-    auction_title = (
-        item.get("auctionTitle") or (item.get("auction") or {}).get("title") or ""
-    )
-    house = "1stDibs"
-    if auction_title:
-        house = f"{house} — {auction_title}"
+    url_path = item.get("localizedPdpUrl") or ""
+    if not url_path:
+        return None
+    url = f"{BASE}{url_path}" if not url_path.startswith("http") else url_path
 
-    # Price/estimate
-    price_info = item.get("price") or item.get("estimate") or {}
-    if isinstance(price_info, dict):
-        low = price_info.get("min") or price_info.get("low") or price_info.get("amount")
-        high = price_info.get("max") or price_info.get("high")
-        currency_raw = price_info.get("currency") or price_info.get("currencyCode") or "USD"
-    else:
-        low = item.get("lowEstimate") or item.get("estimateLow")
-        high = item.get("highEstimate") or item.get("estimateHigh")
-        currency_raw = item.get("currency") or item.get("currencyCode") or "USD"
+    title = item.get("title") or "Untitled"
 
-    currency = CURRENCY_SYMBOL.get(str(currency_raw).upper(), str(currency_raw))
+    # Price from displayPriceTracking or displayPrice
+    price_amt = None
+    currency = "$"
+    for price_field in ("displayPriceTracking", "displayPrice"):
+        entries = item.get(price_field) or []
+        if entries and isinstance(entries, list):
+            converted = (entries[0] or {}).get("convertedAmountList") or []
+            if converted:
+                price_amt, currency = _preferred_price(converted)
+                break
 
     # Image
-    image = item.get("firstPhotoUrl") or item.get("imageUrl") or item.get("photo")
-    if isinstance(image, dict):
-        image = image.get("url") or image.get("src") or image.get("smallPath")
+    photos = item.get("carouselPhotos") or item.get("productPhotos") or []
+    image_url = None
+    if photos:
+        image_url = photos[0].get("smallPath") or photos[0].get("masterOrZoomPath")
+
+    # Seller / gallery name
+    seller_co = (
+        ((item.get("seller") or {}).get("sellerProfile") or {}).get("company") or ""
+    )
+    house = f"1stDibs — {seller_co}" if seller_co else "1stDibs"
 
     return Lot(
         source=name,
-        artist=artist_name,
-        title=str(title),
+        artist=artist_display,
+        title=title,
         house=house,
-        close_date=close_dt.astimezone(timezone.utc),
+        close_date=None,
         url=url,
-        image_url=image or None,
-        estimate_low=int(low) if low else None,
-        estimate_high=int(high) if high else None,
+        image_url=image_url or None,
+        estimate_low=price_amt,
+        estimate_high=None,
         currency=currency,
     )
 
 
-def _extract_from_gql(payload: dict, artist_name: str) -> list[Lot]:
-    """Walk a GraphQL response to find lot nodes."""
+def _extract_items(gql_data: dict) -> list[dict]:
+    """Walk the GraphQL itemSearch response and return raw item dicts."""
+    edges = (
+        (gql_data.get("data") or {})
+        .get("viewer", {})
+        .get("itemSearch", {})
+        .get("edges") or []
+    )
+    items = []
+    for edge in edges:
+        # Walk nested structure to find item with serviceId
+        def find(node):
+            if isinstance(node, dict):
+                if node.get("serviceId") and node.get("title"):
+                    return node
+                for v in node.values():
+                    r = find(v)
+                    if r:
+                        return r
+            return None
+        item = find(edge)
+        if item:
+            items.append(item)
+    return items
+
+
+async def _search_artist_pw(page, artist: Artist) -> list[Lot]:
+    """Load one search page and extract matching lots."""
+    artist_norm = _normalize(artist.name)
+    captured = []
+
+    async def on_response(response):
+        if "soa/graphql" in response.url and response.status == 200:
+            try:
+                data = await response.json()
+                if (data.get("data") or {}).get("viewer", {}).get("itemSearch"):
+                    captured.append(data)
+            except Exception:
+                pass
+
+    page.on("response", on_response)
+    try:
+        url = f"{SEARCH_BASE}?q={artist.name.replace(' ', '+')}&sort=newest"
+        await page.goto(url, wait_until="networkidle", timeout=30000)
+    except Exception as e:
+        log.debug("1stdibs: %s page error: %s", artist.name, e)
+    finally:
+        page.remove_listener("response", on_response)
+
     lots = []
-    if not isinstance(payload, dict):
-        return lots
+    for gql in captured:
+        for item in _extract_items(gql):
+            # Verify artist via creators list; fall back to title only if no creators
+            creators = item.get("creators") or []
+            creator_names = [
+                _normalize((c.get("creator") or {}).get("displayName") or "")
+                for c in creators
+            ]
+            if creator_names:
+                if artist_norm not in creator_names:
+                    continue
+            else:
+                if artist_norm not in _normalize(item.get("title") or ""):
+                    continue
 
-    # Try common GraphQL response shapes
-    data = payload.get("data") or payload
+            lot = _item_to_lot(item, artist.name)
+            if lot:
+                lots.append(lot)
+                if len(lots) >= MAX_PER_ARTIST:
+                    break
+        if len(lots) >= MAX_PER_ARTIST:
+            break
 
-    def _walk(node):
-        if isinstance(node, dict):
-            # Check if this looks like a lot/item node
-            if node.get("pdpUrl") or (node.get("url") and node.get("endDate")):
-                lot = _gql_item_to_lot(node, artist_name)
-                if lot:
-                    lots.append(lot)
-                    return
-            # Look for edges/nodes pattern
-            for key in ("edges", "nodes", "items", "results", "lots", "hits"):
-                val = node.get(key)
-                if isinstance(val, list):
-                    for item in val:
-                        _walk(item)
-            # Walk other dict values
-            for v in node.values():
-                if isinstance(v, (dict, list)):
-                    _walk(v)
-        elif isinstance(node, list):
-            for item in node:
-                _walk(item)
-
-    _walk(data)
     return lots
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
-    # 1stDibs is a buy-now marketplace; no timed auction lots are exposed via API.
-    return []
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        log.warning("1stdibs: playwright not installed, skipping")
+        return []
+
+    from ._playwright_utils import new_browser_context
+
+    sem = asyncio.Semaphore(CONCURRENCY)
+    all_lots: list[Lot] = []
+
+    async with async_playwright() as p:
+        browser, context = await new_browser_context(p)
+
+        async def _one(artist: Artist) -> list[Lot]:
+            async with sem:
+                page = await context.new_page()
+                try:
+                    return await _search_artist_pw(page, artist)
+                finally:
+                    await page.close()
+
+        results = await asyncio.gather(*(_one(a) for a in artists))
+        all_lots = [lot for sub in results for lot in sub]
+        await browser.close()
+
+    if all_lots:
+        for artist_name in sorted(set(lot.artist for lot in all_lots)):
+            count = sum(1 for lot in all_lots if lot.artist == artist_name)
+            log.info("1stdibs: %-30s → %2d listings", artist_name, count)
+
+    return all_lots
