@@ -47,6 +47,22 @@ def _normalize(s: str) -> str:
     return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
+def _lot_url(hit: dict) -> str:
+    """Build the correct invaluable.com lot URL from Algolia hit fields.
+
+    Format: /auction-lot/{title-slug}-{lot_number}-c-{lot_ref_lower}
+    The lot_ref (last 10-char hex) is the canonical ID; slug and number are cosmetic.
+    """
+    lot_ref = (hit.get("lotRef") or "").lower()
+    lot_number = str(hit.get("lotNumber") or "").strip().lower()
+    title = hit.get("lotTitle") or ""
+    nfkd = unicodedata.normalize("NFKD", title)
+    ascii_title = "".join(c for c in nfkd if not unicodedata.combining(c))
+    slug = re.sub(r"-{2,}", "-", re.sub(r"[^a-z0-9]+", "-", ascii_title.lower())).strip("-")
+    parts = [p for p in [slug, lot_number] if p] + [f"c-{lot_ref}"]
+    return "https://www.invaluable.com/auction-lot/" + "-".join(parts)
+
+
 def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
     # Prefer endTimeUTCUnix (per-lot closing time) over dateTimeUTCUnix (sale start)
     ts = hit.get("endTimeUTCUnix") or hit.get("dateTimeUTCUnix")
@@ -58,13 +74,9 @@ def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
         return None
 
     lot_ref = hit.get("lotRef")
-    catalog_ref = hit.get("catalogRef")
     if not lot_ref:
         return None
-    if catalog_ref:
-        url = f"https://www.invaluable.com/catalog/{catalog_ref}/lots/{lot_ref}/"
-    else:
-        url = f"https://www.invaluable.com/auction-lot/{lot_ref}/"
+    url = _lot_url(hit)
 
     house = hit.get("houseName") or "Invaluable"
     title = hit.get("lotTitle") or "Untitled"

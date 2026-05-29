@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import os
+import re
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -78,7 +80,14 @@ def _within_window(lots: list[Lot], days: int) -> list[Lot]:
     return [l for l in lots if l.close_date is None or now <= l.close_date <= cutoff]
 
 
+def _norm(s: str) -> str:
+    nfkd = unicodedata.normalize("NFKD", s)
+    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
+    return re.sub(r"\s+", " ", stripped).strip().lower()
+
+
 def _dedupe(lots: list[Lot]) -> list[Lot]:
+    # Pass 1: exact URL dedup
     seen: set[str] = set()
     out: list[Lot] = []
     for lot in lots:
@@ -86,7 +95,23 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
             continue
         seen.add(lot.dedupe_key)
         out.append(lot)
-    return out
+
+    # Pass 2: cross-source dedup — Artsy is an aggregator and often mirrors lots
+    # already found by a direct-house scraper. Drop Artsy lots when the same
+    # (artist, title_prefix, close_date_day) is covered by another source.
+    direct_keys: set[tuple] = set()
+    for lot in out:
+        if lot.source != "artsy" and lot.close_date is not None:
+            direct_keys.add((_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()))
+
+    return [
+        lot for lot in out
+        if not (
+            lot.source == "artsy"
+            and lot.close_date is not None
+            and (_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()) in direct_keys
+        )
+    ]
 
 
 def cli():
