@@ -2,7 +2,7 @@ name: Auction Digest
 
 on:
   schedule:
-    - cron: '0 14 * * 5'  # Fridays 2pm UTC = 4pm CEST
+    - cron: '0 14 * * *'  # Daily 2pm UTC = 4pm CEST
   workflow_dispatch:        # enables the "Run workflow" button
 
 jobs:
