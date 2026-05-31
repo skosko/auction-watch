@@ -16,6 +16,8 @@ dependencies = [
 
 [project.scripts]
 auction-watch = "auction_watch.main:cli"
+auction-watch-add = "auction_watch.add_artist:cli"
+auction-watch-sync = "auction_watch.sync:cli"
 
 [build-system]
 requires = ["hatchling"]

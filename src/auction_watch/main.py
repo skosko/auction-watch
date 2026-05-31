@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from .artists import Artist, load_artists
 from .mailer import cat_image_url, send_digest
 from .models import Lot
-from .render import render_digest
+from .render import render_digest, render_web
 from .scrapers import (
     artsy,
     bonhams,
@@ -148,6 +148,12 @@ def cli():
     out = Path("last_digest.html")
     out.write_text(html, encoding="utf-8")
     log.info("Wrote %s", out.resolve())
+
+    web = render_web(lots, artist_slugs=artist_slugs)
+    web_out = Path("_site/index.html")
+    web_out.parent.mkdir(exist_ok=True)
+    web_out.write_text(web, encoding="utf-8")
+    log.info("Wrote %s", web_out.resolve())
 
     if not os.environ.get("RESEND_API_KEY"):
         log.info("RESEND_API_KEY not set — skipping send.")

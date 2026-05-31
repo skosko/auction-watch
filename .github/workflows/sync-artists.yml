@@ -1,0 +1,38 @@
+name: Sync Artists from Artsy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Sync follows
+        env:
+          ARTSY_CLIENT_ID: ${{ secrets.ARTSY_CLIENT_ID }}
+          ARTSY_CLIENT_SECRET: ${{ secrets.ARTSY_CLIENT_SECRET }}
+          ARTSY_EMAIL: ${{ secrets.ARTSY_EMAIL }}
+          ARTSY_PASSWORD: ${{ secrets.ARTSY_PASSWORD }}
+        run: uv run auction-watch-sync
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet artists.yml || (
+            git add artists.yml &&
+            git commit -m "Sync artists from Artsy follows" &&
+            git push
+          )
