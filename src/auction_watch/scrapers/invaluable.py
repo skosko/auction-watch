@@ -135,7 +135,10 @@ async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]
     lots = []
     for hit in hits:
         hit_artist = _normalize(hit.get("artistName") or "")
-        # Accept if there's substantial overlap (handles partial name matches)
+        # Require a non-empty artist name and substantial overlap in both directions.
+        # Empty hit_artist must be rejected — "" is a substring of everything.
+        if not hit_artist:
+            continue
         if artist_norm not in hit_artist and hit_artist not in artist_norm:
             continue
         lot = _hit_to_lot(hit, artist.name)
