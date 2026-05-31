@@ -39,7 +39,7 @@ query ArtistAuctionLots($slug: String!, $first: Int!) {
         node {
           title
           href
-          image { url }
+          image { url(version: ["large", "medium"]) }
           dimensions { cm in }
           saleArtwork {
             currency
