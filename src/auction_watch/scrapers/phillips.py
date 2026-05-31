@@ -8,13 +8,13 @@ One GET request returns all ~130 upcoming lots across all active sales.
 import json
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -27,12 +27,6 @@ USER_AGENT = (
 )
 
 LOTS_ARRAY_RE = re.compile(r'"lots"\s*:\s*\[')
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _walk_array(text: str, start: int) -> str | None:
@@ -72,7 +66,7 @@ def _parse_dt(s: str | None) -> datetime | None:
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
-    artists_by_norm = {_normalize(a.name): a.name for a in artists}
+    artists_by_norm = {normalize(a.name): a.name for a in artists}
 
     try:
         r = await client.get(
@@ -108,7 +102,7 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
 
     lots: list[Lot] = []
     for raw in all_lots:
-        maker_norm = _normalize(raw.get("makerName") or "")
+        maker_norm = normalize(raw.get("makerName") or "")
         display = artists_by_norm.get(maker_norm)
         if not display:
             continue

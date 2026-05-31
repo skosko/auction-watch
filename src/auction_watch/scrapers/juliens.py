@@ -14,7 +14,6 @@ Concurrency: 10 (pure API calls, fast).
 import asyncio
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import quote
 
@@ -22,6 +21,7 @@ import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -45,12 +45,6 @@ HEADERS = {
     "Origin": "https://www.juliensauctions.com",
     "Referer": "https://www.juliensauctions.com/",
 }
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _fts_query(artist_name: str) -> str:
@@ -99,12 +93,12 @@ async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]
     if not isinstance(hits, list):
         return []
 
-    artist_norm = _normalize(artist.name)
+    artist_norm = normalize(artist.name)
     lots = []
 
     for hit in hits:
         # Verify artist name actually appears in the lot title
-        title_norm = _normalize(hit.get("title") or "")
+        title_norm = normalize(hit.get("title") or "")
         if artist_norm not in title_norm:
             continue
 

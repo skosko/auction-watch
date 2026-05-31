@@ -15,13 +15,13 @@ import asyncio
 import json
 import logging
 import re
-import unicodedata
 from datetime import datetime, timedelta, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol, normalize
 
 log = logging.getLogger(__name__)
 
@@ -38,9 +38,6 @@ SALE_FETCH_CONCURRENCY = 4
 LANDING_URL_RE = re.compile(r'"landing_url"\s*:\s*"https?://[^"]*/en/auction/')
 LOTS_ARRAY_RE = re.compile(r'"lots"\s*:\s*\[')
 ESTIMATE_CURRENCY_RE = re.compile(r"^([A-Z]{3})\s")
-
-CURRENCY_SYMBOL = {"USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$", "CHF": "CHF ", "JPY": "¥"}
-
 
 def _walk_object(text: str, start: int) -> str | None:
     """Return the slice of `text` starting at `text[start] == '{'` that closes the object."""
@@ -145,12 +142,6 @@ def _parse_iso(s: str | None) -> datetime | None:
         return None
 
 
-def _normalize(name_: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", name_)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
-
-
 def _extract_lots(sale_html: str) -> list[dict]:
     m = LOTS_ARRAY_RE.search(sale_html)
     if not m:
@@ -191,7 +182,7 @@ def _lot_to_model(
     cur = None
     m = ESTIMATE_CURRENCY_RE.match(lot.get("estimate_txt") or "")
     if m:
-        cur = CURRENCY_SYMBOL.get(m.group(1), m.group(1))
+        cur = currency_symbol(m.group(1))
 
     # Prefer the lot's own end_date when it's plausible; otherwise fall back to sale date.
     close_dt = _parse_iso(lot.get("end_date")) or sale_close
@@ -230,7 +221,7 @@ def _match_artist(text: str, artists_by_norm: dict[str, str]) -> str | None:
     """Return the display name if any followed artist's normalized name appears in `text`."""
     if not text:
         return None
-    norm_text = _normalize(text)
+    norm_text = normalize(text)
     for norm_name, display in artists_by_norm.items():
         # word-ish boundary check to avoid e.g. "ai" matching "fair"
         if norm_name in norm_text:
@@ -245,7 +236,7 @@ def _match_artist(text: str, artists_by_norm: dict[str, str]) -> str | None:
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist], days: int = 90) -> list[Lot]:
-    artists_by_norm = {_normalize(a.name): a.name for a in artists}
+    artists_by_norm = {normalize(a.name): a.name for a in artists}
 
     calendar_html = await _fetch(client, CALENDAR_URL)
     if not calendar_html:

@@ -13,7 +13,6 @@ playwright-stealth or a different data source).
 import asyncio
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import quote
 
@@ -21,6 +20,7 @@ import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol, normalize
 
 log = logging.getLogger(__name__)
 
@@ -28,18 +28,6 @@ name = "dorotheum"
 
 SEARCH_URL = "https://www.dorotheum.com/en/search/"
 CONCURRENCY = 2
-
-CURRENCY_SYMBOL = {
-    "USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$",
-    "CHF": "CHF ", "JPY": "¥", "AUD": "A$", "CAD": "C$",
-}
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
-
 
 def _parse_dt(s) -> datetime | None:
     if not s:
@@ -91,7 +79,7 @@ def _item_to_lot(item: dict, artist_name: str) -> Lot | None:
         house = f"{house} — {auction_title}"
 
     currency_raw = item.get("currency") or item.get("currencyCode") or "EUR"
-    currency = CURRENCY_SYMBOL.get(str(currency_raw).upper(), str(currency_raw))
+    currency = currency_symbol(str(currency_raw))
 
     low = item.get("estimateLow") or item.get("lowEstimate") or item.get("priceEstimateFrom")
     high = item.get("estimateHigh") or item.get("highEstimate") or item.get("priceEstimateTo")

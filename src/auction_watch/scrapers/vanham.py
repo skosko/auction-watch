@@ -20,13 +20,13 @@ Concurrency: 5 searches, 10 detail fetches.
 import asyncio
 import logging
 import re
-import unicodedata
 from datetime import datetime, timedelta, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -45,12 +45,6 @@ HEADERS = {
     ),
     "Accept": "text/html,*/*",
 }
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _parse_german_int(s: str) -> int | None:
@@ -109,7 +103,7 @@ def _parse_search_page(html: str, artist_norm: str, artist_display: str) -> list
         if not artist_m:
             continue
         card_artist = re.sub(r"<[^>]+>", "", artist_m.group(1)).strip()
-        if _normalize(card_artist) != artist_norm:
+        if normalize(card_artist) != artist_norm:
             continue
 
         seen_ids.add(lot_id)
@@ -226,7 +220,7 @@ async def _search_artist(
     )
     if not html:
         return []
-    return _parse_search_page(html, _normalize(artist.name), artist.name)
+    return _parse_search_page(html, normalize(artist.name), artist.name)
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:

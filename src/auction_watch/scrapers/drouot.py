@@ -6,18 +6,23 @@ One lot-search call per artist, then cached sale-detail lookups to
 resolve auctioneer name + sale title into the house field.
 
 Concurrency: 10 searches in parallel, 5 parallel sale-detail fetches.
+Sale details are cached to disk (drouot_sale_cache.json in the working
+directory) so repeat runs skip already-seen sales.
 """
 
 import asyncio
+import json
 import logging
 import re
 import unicodedata
 from datetime import datetime, timezone
+from pathlib import Path
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol, extract_dimensions, normalize
 
 log = logging.getLogger(__name__)
 
@@ -40,86 +45,88 @@ HEADERS = {
     "Referer": "https://drouot.com/",
 }
 
-CURRENCY_SYMBOL = {
-    "USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$",
-    "CHF": "CHF ", "JPY": "¥", "AUD": "A$", "CAD": "C$",
-}
-
 # Lots whose sale is in one of these states are still open
 ACTIVE_STATUSES = {"CREATED", "IN_PROGRESS", "OPEN"}
 
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
+# ── Sale detail cache ──────────────────────────────────────────────────────
+_SALE_CACHE_PATH = Path("drouot_sale_cache.json")
+_sale_cache: dict[int, str] = {}
 
 
-# N x N [x N] cm/in/mm — also handles comma as decimal separator
-_DIM_RE = re.compile(
-    r"(\d+(?:[.,]\d+)?)\s*[xX×]\s*(\d+(?:[.,]\d+)?)"
-    r"(?:\s*[xX×]\s*[\d.,]+)?\s*(cm|in(?:ch(?:es)?)?|mm)\b",
-    re.IGNORECASE,
-)
-
-# French H/L labelled format: "H: 19; L: 26 cm" or "Hauteur: 50, Largeur: 70 cm"
-# High-confidence: both labels present + explicit unit.
-_DIM_HL_RE = re.compile(
-    r"[Hh](?:auteur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(?:cm|in|mm)?\s*[;,]?\s*"
-    r"[Ll](?:argeur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(cm|in(?:ch(?:es)?)?|mm)\b",
-    re.IGNORECASE,
-)
-
-
-def _to_cm(a: float, b: float, unit: str) -> str:
-    u = unit.lower()
-    if u == "mm":
-        a, b = round(a / 10, 1), round(b / 10, 1)
-    elif u.startswith("in"):
-        a, b = round(a * 2.54, 1), round(b * 2.54, 1)
-    return f"{a:g} × {b:g} cm"
-
-
-def _extract_dimensions(text: str) -> str | None:
-    m = _DIM_RE.search(text)
-    if m:
+def _load_sale_cache() -> None:
+    global _sale_cache
+    if _SALE_CACHE_PATH.exists():
         try:
-            w, h = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
-        except ValueError:
-            return None
-        return _to_cm(w, h, m.group(3))
-    m = _DIM_HL_RE.search(text)
-    if m:
-        try:
-            h_val, l_val = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
-        except ValueError:
-            return None
-        return _to_cm(h_val, l_val, m.group(3))
-    return None
+            raw = json.loads(_SALE_CACHE_PATH.read_text(encoding="utf-8"))
+            _sale_cache = {int(k): v for k, v in raw.items()}
+            log.debug("drouot: loaded %d cached sale names", len(_sale_cache))
+        except Exception as e:
+            log.debug("drouot: sale cache load failed: %s", e)
+            _sale_cache = {}
+
+
+def _save_sale_cache() -> None:
+    try:
+        _SALE_CACHE_PATH.write_text(
+            json.dumps({str(k): v for k, v in _sale_cache.items()}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        log.debug("drouot: sale cache save failed: %s", e)
+
+
+# ── Title / description parsing ────────────────────────────────────────────
+
+# Drouot descriptions appear in several formats:
+#   1. Structured: "Titre :\nActual Title\n..."
+#   2. Quoted:     'Artist (bio). "Title". year'  or  'ARTIST ... «Title». year'
+#   3. Newline:    "Artist.\n\nTitle. year\n\nMaterials..."
+#   4. ALL-CAPS:   "ARTIST bio TITLE year" (fallback)
+
+# High-confidence quoted title: "…" «…» or similar typographic quotes.
+_DQUOTE_RE = re.compile(r'["\u00ab\u201c]([^"\u00bb\u201d\n]{3,150})["\u00bb\u201d]')
+# Lower-confidence single-quoted title: 'ALL-CAPS …' — require uppercase start.
+_SQUOTE_RE = re.compile(r"'([A-ZÀÂÄÉÈÊËÎÏÔÙÛÜŒ][^'\n]{2,100})'")
+# After double-newline: "Artist.\n\nTitle. year\n\n..."
+_AFTER_NL_RE = re.compile(r"\n\n([^\n]{5,})")
 
 
 def _parse_title(description: str) -> str:
-    """Extract a clean title from a raw Drouot description.
-
-    Two formats seen in the wild:
-    1. Structured (labelled fields): contains "Titre :\\nActual Title.\\n..."
-       — extract the Titre field directly.
-    2. Flat: starts with "LASTNAME FIRSTNAME ..." in ALL-CAPS
-       — strip leading all-caps tokens until the first mixed-case word.
-    """
-    # Format 1: structured labelled fields
+    """Extract a clean title from a raw Drouot description."""
+    # Format 1: structured labelled fields "Titre :\nTitle" or "Title :\nTitle"
     m = re.search(r"(?:Titre|Title)\s*:\s*\n([^\n]+)", description, re.IGNORECASE)
     if m:
         title = m.group(1).strip().rstrip(".")
         if title:
             return title
 
-    # Format 2: strip ALL-CAPS artist header tokens
+    # Format 2a: double-quoted or guillemet title — high confidence
+    m = _DQUOTE_RE.search(description)
+    if m:
+        title = m.group(1).strip().rstrip(".")
+        if title:
+            return title
+
+    # Format 3: title immediately after the first double newline
+    m = _AFTER_NL_RE.search(description)
+    if m:
+        # Take only the first sentence (before the first period)
+        first = m.group(1).split(".")[0].strip()
+        if first and len(first) < 200:
+            return first
+
+    # Format 2b: single-quoted ALL-CAPS title — lower confidence
+    m = _SQUOTE_RE.search(description)
+    if m:
+        title = m.group(1).strip().rstrip(".")
+        if title:
+            return title
+
+    # Format 4: strip ALL-CAPS artist header tokens (original fallback)
     tokens = description.split()
     i = 0
     while i < len(tokens):
         letters = re.sub(r"[^a-zA-Z]", "", tokens[i])
-        # Skip tokens that are all-caps or contain no letters (punctuation)
         if not letters or letters.isupper():
             i += 1
         else:
@@ -171,6 +178,8 @@ def _desc_matches_artist(artist_norm: str, desc_norm: str) -> bool:
 
 async def _get_sale_house(client: httpx.AsyncClient, sale_id: int) -> str:
     """Return 'AuctioneerName — SaleTitle' for a sale, or 'Drouot'."""
+    if sale_id in _sale_cache:
+        return _sale_cache[sale_id]
     try:
         r = await client.get(
             f"{API_BASE}/neoGingo/sale/{sale_id}",
@@ -189,9 +198,11 @@ async def _get_sale_house(client: httpx.AsyncClient, sale_id: int) -> str:
             house = auctioneer or "Drouot"
             if title:
                 house = f"{house} — {title}"
+            _sale_cache[sale_id] = house
             return house
     except Exception:
         pass
+    _sale_cache[sale_id] = "Drouot"
     return "Drouot"
 
 
@@ -213,7 +224,7 @@ async def _search_artist(
         return []
 
     hits = r.json().get("lots") or []
-    artist_norm = _normalize(artist.name)
+    artist_norm = normalize(artist.name)
     raws = []
 
     for hit in hits:
@@ -222,7 +233,7 @@ async def _search_artist(
             continue
 
         # Artist name verification: description usually starts with "LASTNAME FIRSTNAME"
-        desc_norm = _normalize(hit.get("description") or "")
+        desc_norm = normalize(hit.get("description") or "")
         if not _desc_matches_artist(artist_norm, desc_norm):
             continue
 
@@ -256,6 +267,8 @@ async def _search_artist(
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
+    _load_sale_cache()
+
     sem_search = asyncio.Semaphore(CONCURRENCY)
     sem_sale = asyncio.Semaphore(CONCURRENCY_SALE)
 
@@ -267,17 +280,21 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
     all_raws = [r for sub in all_raws_nested for r in sub]
 
     if not all_raws:
+        _save_sale_cache()
         return []
 
-    # Resolve unique sale IDs → house strings
+    # Resolve unique sale IDs → house strings (cache-aware)
     sale_ids = {r["sale_id"] for r in all_raws if r.get("sale_id")}
+    uncached = sale_ids - set(_sale_cache.keys())
 
     async def _one_sale(sid: int) -> tuple[int, str]:
         async with sem_sale:
             return sid, await _get_sale_house(client, sid)
 
-    sale_results = await asyncio.gather(*(_one_sale(sid) for sid in sale_ids))
-    sale_map: dict[int, str] = dict(sale_results)
+    if uncached:
+        await asyncio.gather(*(_one_sale(sid) for sid in uncached))
+
+    _save_sale_cache()
 
     # Build Lot objects
     lots: list[Lot] = []
@@ -287,11 +304,11 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
         except (OSError, OverflowError, ValueError):
             continue
 
-        house = sale_map.get(raw.get("sale_id"), "Drouot")
-        currency = CURRENCY_SYMBOL.get(raw["currency_id"], raw["currency_id"]) or None
+        house = _sale_cache.get(raw.get("sale_id"), "Drouot")
+        cur = currency_symbol(raw["currency_id"])
         desc = raw["description"]
         title = _strip_artist_prefix(_parse_title(desc), raw["artist_name"])[:200]
-        dimensions = _extract_dimensions(desc)
+        dimensions = extract_dimensions(desc)
 
         lots.append(Lot(
             source=name,
@@ -303,7 +320,7 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
             image_url=raw.get("image_url"),
             estimate_low=int(raw["low"]) if raw.get("low") else None,
             estimate_high=int(raw["high"]) if raw.get("high") else None,
-            currency=currency,
+            currency=cur,
             dimensions=dimensions,
         ))
 

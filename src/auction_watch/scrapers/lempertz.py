@@ -25,6 +25,7 @@ import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import extract_dimensions
 
 log = logging.getLogger(__name__)
 
@@ -170,22 +171,7 @@ async def _fetch_lot(client: httpx.AsyncClient, url: str) -> dict | None:
                 estimate_high = int(float(high))
             # Dimensions from description field
             desc = data.get("description", "")
-            dim_m = re.search(
-                r"(\d+(?:[.,]\d+)?)\s*[xX×]\s*(\d+(?:[.,]\d+)?)"
-                r"(?:\s*[xX×]\s*[\d.,]+)?\s*(cm|in(?:ch(?:es)?)?)\b",
-                desc,
-                re.IGNORECASE,
-            )
-            if dim_m:
-                try:
-                    w = float(dim_m.group(1).replace(",", "."))
-                    h = float(dim_m.group(2).replace(",", "."))
-                    unit = dim_m.group(3).lower()
-                    if unit.startswith("in"):
-                        w, h = round(w * 2.54, 1), round(h * 2.54, 1)
-                    dimensions = f"{w:g} × {h:g} cm"
-                except ValueError:
-                    pass
+            dimensions = extract_dimensions(desc)
         except (json.JSONDecodeError, ValueError):
             pass
 

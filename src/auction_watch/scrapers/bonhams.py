@@ -11,13 +11,13 @@ import asyncio
 import json
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 
 from curl_cffi.requests import AsyncSession
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol, normalize
 
 log = logging.getLogger(__name__)
 
@@ -34,18 +34,7 @@ BRAND_BASE = {
     "cornette": "https://csc.bonhams.com",
 }
 
-CURRENCY_SYMBOL = {
-    "USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$",
-    "CHF": "CHF ", "JPY": "¥", "AUD": "A$", "CAD": "C$",
-}
-
 CONCURRENCY = 5
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _parse_dt(s: str | None) -> datetime | None:
@@ -75,7 +64,7 @@ def _lot_to_model(raw: dict, artist_name: str) -> Lot | None:
 
     price = raw.get("price") or {}
     iso_code = (raw.get("currency") or {}).get("iso_code") or ""
-    currency = CURRENCY_SYMBOL.get(iso_code, iso_code) or None
+    currency = currency_symbol(iso_code)
 
     house = "Bonhams"
     if brand == "skinner":
@@ -126,12 +115,12 @@ async def _search_artist(session: AsyncSession, artist: Artist) -> list[Lot]:
         .get("auctionLots", [])
     )
 
-    artist_norm = _normalize(artist.name)
+    artist_norm = normalize(artist.name)
     lots = []
     for raw in raw_lots:
         # Bonhams full-text search returns false positives; verify the artist
         # name actually appears in the lot title before including.
-        title_norm = _normalize(raw.get("title") or "")
+        title_norm = normalize(raw.get("title") or "")
         if artist_norm not in title_norm:
             continue
         lot = _lot_to_model(raw, artist.name)

@@ -17,12 +17,12 @@ Concurrency: 3 simultaneous browser pages.
 import asyncio
 import logging
 import re
-import unicodedata
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -32,12 +32,6 @@ BASE = "https://www.1stdibs.com"
 SEARCH_BASE = f"{BASE}/search/art/"
 CONCURRENCY = 3
 MAX_PER_ARTIST = 10
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _preferred_price(converted: list[dict]) -> tuple[int | None, str]:
@@ -125,7 +119,7 @@ def _extract_items(gql_data: dict) -> list[dict]:
 
 async def _search_artist_pw(page, artist: Artist) -> list[Lot]:
     """Load one search page and extract matching lots."""
-    artist_norm = _normalize(artist.name)
+    artist_norm = normalize(artist.name)
     captured = []
 
     async def on_response(response):
@@ -152,14 +146,14 @@ async def _search_artist_pw(page, artist: Artist) -> list[Lot]:
             # Verify artist via creators list; fall back to title only if no creators
             creators = item.get("creators") or []
             creator_names = [
-                _normalize((c.get("creator") or {}).get("displayName") or "")
+                normalize((c.get("creator") or {}).get("displayName") or "")
                 for c in creators
             ]
             if creator_names:
                 if artist_norm not in creator_names:
                     continue
             else:
-                if artist_norm not in _normalize(item.get("title") or ""):
+                if artist_norm not in normalize(item.get("title") or ""):
                     continue
 
             lot = _item_to_lot(item, artist.name)

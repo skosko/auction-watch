@@ -20,6 +20,7 @@ import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol
 
 log = logging.getLogger(__name__)
 
@@ -32,9 +33,6 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 CONCURRENCY = 5
-
-CURRENCY_SYMBOL = {"USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$", "CHF": "CHF ", "JPY": "¥"}
-
 
 def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
     end_ms = hit.get("endDate")
@@ -62,7 +60,7 @@ def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
         image_url=hit.get("image") or None,
         estimate_low=hit.get("lowEstimate"),
         estimate_high=hit.get("highEstimate"),
-        currency=CURRENCY_SYMBOL.get(cur_code, cur_code),
+        currency=currency_symbol(cur_code),
     )
 
 

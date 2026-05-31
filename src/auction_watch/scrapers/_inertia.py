@@ -14,13 +14,13 @@ import html
 import json
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -50,12 +50,6 @@ def _parse_inertia(html_text: str) -> dict:
     except json.JSONDecodeError:
         return {}
 
-
-def _normalize(name: str) -> str:
-    """Lowercase + strip diacritics for forgiving artist-name matching."""
-    nfkd = unicodedata.normalize("NFKD", name)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _parse_high_estimate(formatted: str | None) -> int | None:
@@ -112,7 +106,7 @@ async def collect_for_house(
     artists: list[Artist],
     days: int = 90,
 ) -> list[Lot]:
-    artists_by_norm = {_normalize(a.name): a.name for a in artists}
+    artists_by_norm = {normalize(a.name): a.name for a in artists}
 
     index = await _fetch_session(
         client, asyncio.Semaphore(1), f"{base_url}/auctions"
@@ -153,7 +147,7 @@ async def collect_for_house(
             raw_artist = (item.get("artist_name") or "").strip()
             if not raw_artist:
                 continue
-            display = artists_by_norm.get(_normalize(raw_artist))
+            display = artists_by_norm.get(normalize(raw_artist))
             if not display:
                 continue
             alias = (item.get("alias") or "").lstrip("/")

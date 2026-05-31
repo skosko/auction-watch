@@ -11,13 +11,13 @@ Strategy:
 import asyncio
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import normalize
 
 log = logging.getLogger(__name__)
 
@@ -31,12 +31,6 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
 )
 PAGE_SIZE = 30
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _parse_german_date(s: str) -> datetime | None:
@@ -95,7 +89,7 @@ def _parse_lots_html(
         if " - " not in alt:
             continue
         artist_part, title_part = alt.split(" - ", 1)
-        artist_norm = _normalize(artist_part)
+        artist_norm = normalize(artist_part)
 
         display = artists_by_norm.get(artist_norm)
         if not display:
@@ -168,7 +162,7 @@ async def _get_all_lots_html(client: httpx.AsyncClient) -> list[str]:
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
-    artists_by_norm = {_normalize(a.name): a.name for a in artists}
+    artists_by_norm = {normalize(a.name): a.name for a in artists}
 
     auction_dates, pages = await asyncio.gather(
         _get_auction_dates(client),

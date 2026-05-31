@@ -7,6 +7,7 @@ import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol
 
 log = logging.getLogger(__name__)
 
@@ -18,18 +19,6 @@ ARTIST_CONCURRENCY = 3
 
 METAPHYSICS = "https://metaphysics-cdn.artsy.net/v2"
 ARTSY_BASE = "https://www.artsy.net"
-
-# ISO code → display symbol. Falls back to the code itself if missing.
-CURRENCY_SYMBOL = {
-    "USD": "$",
-    "GBP": "£",
-    "EUR": "€",
-    "HKD": "HK$",
-    "CHF": "CHF ",
-    "JPY": "¥",
-    "AUD": "A$",
-    "CAD": "C$",
-}
 
 QUERY = """
 query ArtistAuctionLots($slug: String!, $first: Int!) {
@@ -130,7 +119,7 @@ async def search(
         dims = node.get("dimensions") or {}
         dimensions = dims.get("cm") or dims.get("in") or None
         currency_code = sa.get("currency")
-        currency = CURRENCY_SYMBOL.get(currency_code, currency_code)
+        currency = currency_symbol(currency_code)
         lots.append(
             Lot(
                 source="artsy",

@@ -13,13 +13,13 @@ Concurrency: 10 (pure API calls, fast).
 import asyncio
 import logging
 import re
-import unicodedata
 from datetime import datetime, timezone
 
 import httpx
 
 from ..artists import Artist
 from ..models import Lot
+from ._utils import currency_symbol, extract_dimensions, normalize
 
 log = logging.getLogger(__name__)
 
@@ -34,61 +34,6 @@ ALGOLIA_URL = (
 IMAGE_BASE = "https://image.invaluable.com/hermes/"
 
 CONCURRENCY = 10
-
-CURRENCY_SYMBOL = {
-    "USD": "$", "GBP": "£", "EUR": "€", "HKD": "HK$",
-    "CHF": "CHF ", "JPY": "¥", "AUD": "A$", "CAD": "C$",
-}
-
-
-# Matches "N[.N] x N[.N] [x N[.N]] cm/in" — captures first two dims + unit.
-_DIM_RE = re.compile(
-    r"(\d+(?:[.,]\d+)?)\s*[xX×]\s*(\d+(?:[.,]\d+)?)"
-    r"(?:\s*[xX×]\s*[\d.,]+)?\s*(cm|in(?:ch(?:es)?)?|mm)\b",
-    re.IGNORECASE,
-)
-
-# French H/L labelled format: "H: 19; L: 26 cm" — high confidence due to both labels + unit.
-_DIM_HL_RE = re.compile(
-    r"[Hh](?:auteur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(?:cm|in|mm)?\s*[;,]?\s*"
-    r"[Ll](?:argeur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(cm|in(?:ch(?:es)?)?|mm)\b",
-    re.IGNORECASE,
-)
-
-
-def _extract_dimensions(desc: str) -> str | None:
-    """Parse first dimension pattern from a lot description."""
-    m = _DIM_RE.search(desc)
-    if m:
-        try:
-            w, h = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
-        except ValueError:
-            return None
-        unit = m.group(3).lower()
-        if unit == "mm":
-            w, h = round(w / 10, 1), round(h / 10, 1)
-        elif unit.startswith("in"):
-            w, h = round(w * 2.54, 1), round(h * 2.54, 1)
-        return f"{w:g} × {h:g} cm"
-    m = _DIM_HL_RE.search(desc)
-    if m:
-        try:
-            h_val, l_val = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
-        except ValueError:
-            return None
-        unit = m.group(3).lower()
-        if unit == "mm":
-            h_val, l_val = round(h_val / 10, 1), round(l_val / 10, 1)
-        elif unit.startswith("in"):
-            h_val, l_val = round(h_val * 2.54, 1), round(l_val * 2.54, 1)
-        return f"{h_val:g} × {l_val:g} cm"
-    return None
-
-
-def _normalize(s: str) -> str:
-    nfkd = unicodedata.normalize("NFKD", s)
-    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
 def _artist_matches(artist_norm: str, hit_artist: str) -> bool:
@@ -153,7 +98,7 @@ def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
             break
 
     currency_code = (hit.get("currencyCode") or "").upper()
-    currency = CURRENCY_SYMBOL.get(currency_code, currency_code) or None
+    currency = currency_symbol(currency_code)
 
     photo = hit.get("photoPath")
     image_url = f"{IMAGE_BASE}{photo}" if photo else None
@@ -162,7 +107,7 @@ def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
     high = hit.get("estimateHigh")
 
     desc = hit.get("lotDescription") or ""
-    dimensions = _extract_dimensions(desc)
+    dimensions = extract_dimensions(desc)
 
     return Lot(
         source=name,
@@ -206,10 +151,10 @@ async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]
 
     hits = (r.json().get("results") or [{}])[0].get("hits") or []
 
-    artist_norm = _normalize(artist.name)
+    artist_norm = normalize(artist.name)
     lots = []
     for hit in hits:
-        hit_artist = _normalize(hit.get("artistName") or "")
+        hit_artist = normalize(hit.get("artistName") or "")
         # Require a non-empty artist name and substantial overlap in both directions.
         # Empty hit_artist must be rejected — "" is a substring of everything.
         if not _artist_matches(artist_norm, hit_artist):
