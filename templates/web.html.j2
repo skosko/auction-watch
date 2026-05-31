@@ -40,8 +40,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 /* grid */
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:20px 24px;max-width:1600px;margin:0 auto}
 #grid.grid-large{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
-.card{background:#fff;border-radius:8px;border:1px solid #eaeaea;overflow:hidden;display:flex;flex-direction:column}
-.card[hidden]{display:none!important}
+.card{background:#fff;border-radius:8px;border:1px solid #eaeaea;overflow:hidden;display:flex;flex-direction:column;height:100%}
+.card-wrap[hidden]{display:none!important}
 .card-img-link{display:block;aspect-ratio:4/3;background:#f0f0f0;overflow:hidden}
 .grid-large .card-img-link{aspect-ratio:3/2}
 .card-img{width:100%;height:100%;object-fit:contain;display:block}
@@ -59,6 +59,9 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-eur{font-size:11px;color:#aaa}
 .card-dims{font-size:11px;color:#aaa}
 .card-date{font-size:12px;color:#d4541a;margin-top:4px}
+.card-like{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;padding:0;transition:transform .1s;z-index:1}
+.card-like:hover{transform:scale(1.2)}
+.card-wrap{position:relative}
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
 @media(max-width:600px){
   #bar,#price-bar,#add-bar{padding:10px 14px}
@@ -86,6 +89,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
 <div id="bar">
   <button class="chip active" data-artist="">All artists</button>
+  <button class="chip" id="liked-chip" data-liked="0">&#9825; Liked</button>
   {% for artist in artists -%}
   <button class="chip" data-artist="{{ artist }}">{{ artist }}</button>
   {% endfor %}
@@ -119,13 +123,15 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
 <main id="grid">
   {% for lot in lots %}
+  <div class="card-wrap">
   <article class="card"
     data-artist="{{ lot.artist }}"
     data-date="{{ lot.close_date.isoformat() if lot.close_date else '' }}"
     data-house="{{ lot.house }}"
     data-price="{{ lot.estimate_eur if lot.estimate_eur is not none else '' }}"
     data-currency="€"
-    data-area="{{ lot.area_cm2 if lot.area_cm2 is not none else '' }}">
+    data-area="{{ lot.area_cm2 if lot.area_cm2 is not none else '' }}"
+    data-url="{{ lot.url }}">
     {% if lot.image_url -%}
     <a href="{{ lot.url }}" target="_blank" rel="noopener" class="card-img-link">
       <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
@@ -147,6 +153,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       </div>
     </div>
   </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
   {% endfor %}
 </main>
 <p id="empty">No lots match the current filters.</p>
@@ -161,23 +169,68 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   var empty = document.getElementById('empty');
   var sortSel = document.getElementById('sort-sel');
   var layoutBtn = document.getElementById('layout-btn');
-  var cards = Array.from(grid.querySelectorAll('.card'));
+  var wraps = Array.from(grid.querySelectorAll('.card-wrap'));
+  var cards = wraps.map(function (w) { return w.querySelector('.card'); });
   var activeArtist = '';
   var sortMode = 'date';
+  var likedOnly = false;
   var currentPriceMin = -Infinity, currentPriceMax = Infinity, priceFilterActive = false;
+
+  // ── Likes ────────────────────────────────────────────────────────────────
+  var LIKE_KEY = 'aw-likes';
+  function getLikes() {
+    try { return JSON.parse(localStorage.getItem(LIKE_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function saveLikes(likes) {
+    try { localStorage.setItem(LIKE_KEY, JSON.stringify(likes)); } catch (e) {}
+  }
+  function isLiked(url) { return !!getLikes()[url]; }
+
+  function updateLikeBtn(btn, url) {
+    btn.innerHTML = isLiked(url) ? '&#9829;' : '&#9825;';
+    btn.style.color = isLiked(url) ? '#e0345a' : '#888';
+  }
+
+  wraps.forEach(function (wrap) {
+    var card = wrap.querySelector('.card');
+    var btn = wrap.querySelector('.card-like');
+    var url = card.dataset.url;
+    updateLikeBtn(btn, url);
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var likes = getLikes();
+      if (likes[url]) { delete likes[url]; } else { likes[url] = 1; }
+      saveLikes(likes);
+      updateLikeBtn(btn, url);
+      if (likedOnly) applyFilter();
+    });
+  });
+
+  var likedChip = document.getElementById('liked-chip');
+  likedChip.addEventListener('click', function (e) {
+    e.stopPropagation(); // don't trigger artist chip handler
+    likedOnly = !likedOnly;
+    likedChip.dataset.liked = likedOnly ? '1' : '0';
+    likedChip.classList.toggle('active', likedOnly);
+    likedChip.innerHTML = likedOnly ? '&#9829; Liked' : '&#9825; Liked';
+    applyFilter();
+  });
 
   // ── Filter ──────────────────────────────────────────────────────────────
   function applyFilter() {
+    var likes = getLikes();
     var visible = 0;
-    cards.forEach(function (c) {
+    wraps.forEach(function (w) {
+      var c = w.querySelector('.card');
       var artistOk = !activeArtist || c.dataset.artist === activeArtist;
+      var likeOk = !likedOnly || !!likes[c.dataset.url];
       var priceOk = true;
       if (priceFilterActive && c.dataset.price !== '') {
         var p = parseInt(c.dataset.price, 10);
         priceOk = p >= currentPriceMin && p <= currentPriceMax;
       }
-      var show = artistOk && priceOk;
-      c.hidden = !show;
+      var show = artistOk && likeOk && priceOk;
+      w.hidden = !show;
       if (show) visible++;
     });
     empty.style.display = visible ? 'none' : 'block';
@@ -185,7 +238,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
   // ── Sort ────────────────────────────────────────────────────────────────
   function applySort() {
-    var sorted = cards.slice().sort(function (a, b) {
+    var sorted = wraps.slice().sort(function (wa, wb) {
+      var a = wa.querySelector('.card'), b = wb.querySelector('.card');
       if (sortMode === 'house') {
         return (a.dataset.house || '').localeCompare(b.dataset.house || '');
       }
@@ -211,7 +265,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       if (db) return 1;
       return (a.dataset.artist || '').localeCompare(b.dataset.artist || '');
     });
-    sorted.forEach(function (c) { grid.appendChild(c); });
+    sorted.forEach(function (w) { grid.appendChild(w); });
   }
 
   // ── Price filter (log-scale) ─────────────────────────────────────────────
@@ -332,8 +386,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   // ── Artist filter chips ──────────────────────────────────────────────────
   document.getElementById('bar').addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');
-    if (!chip) return;
-    document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+    if (!chip || chip.id === 'liked-chip') return;
+    document.querySelectorAll('.chip:not(#liked-chip)').forEach(function (c) { c.classList.remove('active'); });
     chip.classList.add('active');
     activeArtist = chip.dataset.artist;
     applyFilter();
