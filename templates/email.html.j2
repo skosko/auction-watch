@@ -36,7 +36,7 @@
                   {% if lot.image_url %}
                   <td width="120" valign="top" style="padding-right:16px;">
                     <a href="{{ lot.url }}" style="text-decoration:none;">
-                      <img src="{{ lot.image_url }}" alt="" width="120" style="display:block;border-radius:4px;background:#f0f0f0;">
+                      <img src="{{ lot.image_url }}" alt="" width="120" referrerpolicy="no-referrer" style="display:block;border-radius:4px;background:#f0f0f0;" onerror="this.style.display='none'">
                     </a>
                   </td>
                   {% endif %}
@@ -51,6 +51,7 @@
                     </div>
                     <div style="font-size:13px;color:#555;">{{ lot.house }}</div>
                     <div style="font-size:13px;color:#555;margin-top:2px;">{{ lot|estimate }}</div>
+                    {% if lot.dimensions %}<div style="font-size:12px;color:#999;margin-top:2px;">{{ lot.dimensions }}</div>{% endif %}
                     <div style="font-size:13px;color:#d4541a;margin-top:6px;">
                       {% if lot.close_date %}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{% else %}Available now{% endif %}
                     </div>

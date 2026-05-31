@@ -14,8 +14,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .chip{padding:4px 12px;border-radius:100px;border:1px solid #d0d0d0;background:#fff;font-size:12px;cursor:pointer;white-space:nowrap;color:#1a1a1a;transition:background .12s,color .12s,border-color .12s}
 .chip:hover{background:#f0f0f0}
 .chip.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
-#sort-btn{margin-left:auto;padding:4px 12px;border-radius:100px;border:1px solid #d0d0d0;background:#fff;font-size:12px;cursor:pointer;color:#555;white-space:nowrap}
-#sort-btn:hover{background:#f0f0f0}
+#sort-sel{margin-left:auto;padding:4px 10px;border-radius:100px;border:1px solid #d0d0d0;background:#fff;font-size:12px;cursor:pointer;color:#555;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:20px 24px;max-width:1440px;margin:0 auto}
 .card{background:#fff;border-radius:8px;border:1px solid #eaeaea;overflow:hidden;display:flex;flex-direction:column}
 .card[hidden]{display:none!important}
@@ -30,6 +29,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-title a:hover{text-decoration:underline}
 .card-house{font-size:12px;color:#555}
 .card-estimate{font-size:12px;color:#555}
+.card-dims{font-size:11px;color:#aaa}
 .card-date{font-size:12px;color:#d4541a;margin-top:4px}
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
 @media(max-width:600px){
@@ -60,7 +60,13 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   {% for artist in artists -%}
   <button class="chip" data-artist="{{ artist }}">{{ artist }}</button>
   {% endfor %}
-  <button id="sort-btn">Sorted by date</button>
+  <select id="sort-sel">
+    <option value="date">Sort: Date</option>
+    <option value="house">Sort: House</option>
+    <option value="price-asc">Sort: Price ↑</option>
+    <option value="price-desc">Sort: Price ↓</option>
+    <option value="size-desc">Sort: Size ↓</option>
+  </select>
 </div>
 
 <main id="grid">
@@ -68,9 +74,11 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <article class="card"
     data-artist="{{ lot.artist }}"
     data-date="{{ lot.close_date.isoformat() if lot.close_date else '' }}"
-    data-house="{{ lot.house }}">
+    data-house="{{ lot.house }}"
+    data-price="{{ lot.estimate_low if lot.estimate_low is not none else '' }}"
+    data-area="{{ lot.area_cm2 if lot.area_cm2 is not none else '' }}">
     {% if lot.image_url -%}
-    <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy">
+    <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
     {%- else -%}
     <div class="card-img-ph"></div>
     {%- endif %}
@@ -82,6 +90,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-title"><a href="{{ lot.url }}" target="_blank" rel="noopener">{{ lot.title }}</a></div>
       <div class="card-house">{{ lot.house }}</div>
       <div class="card-estimate">{{ lot | estimate }}</div>
+      {% if lot.dimensions %}<div class="card-dims">{{ lot.dimensions }}</div>{% endif %}
       <div class="card-date">
         {%- if lot.close_date -%}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{%- else -%}Available now{%- endif -%}
       </div>
@@ -99,7 +108,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 (function () {
   var grid = document.getElementById('grid');
   var empty = document.getElementById('empty');
-  var sortBtn = document.getElementById('sort-btn');
+  var sortSel = document.getElementById('sort-sel');
   var cards = Array.from(grid.querySelectorAll('.card'));
   var activeArtist = '';
   var sortMode = 'date';
@@ -119,6 +128,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       if (sortMode === 'house') {
         return (a.dataset.house || '').localeCompare(b.dataset.house || '');
       }
+      if (sortMode === 'price-asc' || sortMode === 'price-desc') {
+        var pa = a.dataset.price !== '' ? parseInt(a.dataset.price, 10) : null;
+        var pb = b.dataset.price !== '' ? parseInt(b.dataset.price, 10) : null;
+        if (pa === null && pb === null) return 0;
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return sortMode === 'price-asc' ? pa - pb : pb - pa;
+      }
+      if (sortMode === 'size-desc') {
+        var sa = a.dataset.area !== '' ? parseInt(a.dataset.area, 10) : null;
+        var sb = b.dataset.area !== '' ? parseInt(b.dataset.area, 10) : null;
+        if (sa === null && sb === null) return 0;
+        if (sa === null) return 1;
+        if (sb === null) return -1;
+        return sb - sa;
+      }
+      // date (default): auction lots first ascending, dealer listings at end
       var da = a.dataset.date, db = b.dataset.date;
       if (da && db) return da < db ? -1 : da > db ? 1 : 0;
       if (da) return -1;
@@ -137,9 +163,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     applyFilter();
   });
 
-  sortBtn.addEventListener('click', function () {
-    sortMode = sortMode === 'date' ? 'house' : 'date';
-    sortBtn.textContent = sortMode === 'date' ? 'Sorted by date' : 'Sorted by house';
+  sortSel.addEventListener('change', function () {
+    sortMode = sortSel.value;
     applySort();
   });
 }());

@@ -40,6 +40,7 @@ query ArtistAuctionLots($slug: String!, $first: Int!) {
           title
           href
           image { url }
+          dimensions { cm in }
           saleArtwork {
             currency
             endAt
@@ -126,6 +127,8 @@ async def search(
         if not url:
             continue
         image_url = (node.get("image") or {}).get("url")
+        dims = node.get("dimensions") or {}
+        dimensions = dims.get("cm") or dims.get("in") or None
         currency_code = sa.get("currency")
         currency = CURRENCY_SYMBOL.get(currency_code, currency_code)
         lots.append(
@@ -140,6 +143,7 @@ async def search(
                 estimate_low=_parse_money((sa.get("lowEstimate") or {}).get("display")),
                 estimate_high=_parse_money((sa.get("highEstimate") or {}).get("display")),
                 currency=currency,
+                dimensions=dimensions,
             )
         )
     return lots
