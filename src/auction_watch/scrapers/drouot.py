@@ -55,6 +55,61 @@ def _normalize(s: str) -> str:
     return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
+# N x N [x N] cm/in/mm — also handles comma as decimal separator
+_DIM_RE = re.compile(
+    r"(\d+(?:[.,]\d+)?)\s*[xX×]\s*(\d+(?:[.,]\d+)?)"
+    r"(?:\s*[xX×]\s*[\d.,]+)?\s*(cm|in(?:ch(?:es)?)?|mm)\b",
+    re.IGNORECASE,
+)
+
+
+def _extract_dimensions(text: str) -> str | None:
+    m = _DIM_RE.search(text)
+    if not m:
+        return None
+    try:
+        w = float(m.group(1).replace(",", "."))
+        h = float(m.group(2).replace(",", "."))
+    except ValueError:
+        return None
+    unit = m.group(3).lower()
+    if unit == "mm":
+        w, h = round(w / 10, 1), round(h / 10, 1)
+    elif unit.startswith("in"):
+        w, h = round(w * 2.54, 1), round(h * 2.54, 1)
+    return f"{w:g} × {h:g} cm"
+
+
+def _parse_title(description: str) -> str:
+    """Extract a clean title from a raw Drouot description.
+
+    Two formats seen in the wild:
+    1. Structured (labelled fields): contains "Titre :\\nActual Title.\\n..."
+       — extract the Titre field directly.
+    2. Flat: starts with "LASTNAME FIRSTNAME ..." in ALL-CAPS
+       — strip leading all-caps tokens until the first mixed-case word.
+    """
+    # Format 1: structured labelled fields
+    m = re.search(r"(?:Titre|Title)\s*:\s*\n([^\n]+)", description, re.IGNORECASE)
+    if m:
+        title = m.group(1).strip().rstrip(".")
+        if title:
+            return title
+
+    # Format 2: strip ALL-CAPS artist header tokens
+    tokens = description.split()
+    i = 0
+    while i < len(tokens):
+        letters = re.sub(r"[^a-zA-Z]", "", tokens[i])
+        # Skip tokens that are all-caps or contain no letters (punctuation)
+        if not letters or letters.isupper():
+            i += 1
+        else:
+            break
+    title = " ".join(tokens[i:]) if i < len(tokens) else ""
+    return title.strip() or description.strip()
+
+
 def _desc_matches_artist(artist_norm: str, desc_norm: str) -> bool:
     """True iff desc_norm plausibly refers to the queried artist.
 
@@ -144,7 +199,7 @@ async def _search_artist(
         raws.append({
             "ts": ts,
             "url": url,
-            "description": (hit.get("description") or "Untitled")[:200],
+            "description": (hit.get("description") or "Untitled")[:600],
             "sale_id": hit.get("saleId"),
             "currency_id": (hit.get("currencyId") or "EUR").upper(),
             "low": hit.get("lowEstim"),
@@ -190,11 +245,14 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
 
         house = sale_map.get(raw.get("sale_id"), "Drouot")
         currency = CURRENCY_SYMBOL.get(raw["currency_id"], raw["currency_id"]) or None
+        desc = raw["description"]
+        title = _parse_title(desc)[:200]
+        dimensions = _extract_dimensions(desc)
 
         lots.append(Lot(
             source=name,
             artist=raw["artist_name"],
-            title=raw["description"],
+            title=title,
             house=house,
             close_date=close_dt,
             url=raw["url"],
@@ -202,6 +260,7 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
             estimate_low=int(raw["low"]) if raw.get("low") else None,
             estimate_high=int(raw["high"]) if raw.get("high") else None,
             currency=currency,
+            dimensions=dimensions,
         ))
 
     by_artist: dict[str, int] = {}
