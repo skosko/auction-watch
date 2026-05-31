@@ -128,6 +128,32 @@ def _parse_title(description: str) -> str:
     return title.strip() or description.strip()
 
 
+def _strip_artist_prefix(text: str, artist_name: str) -> str:
+    """Remove artist-name tokens from the start of text when they match.
+
+    Handles both "FIRSTNAME LASTNAME" and "LASTNAME FIRSTNAME" orderings by
+    comparing sorted normalised word sets. Requires all name words to appear
+    in the first N tokens (where N = number of name words).
+    """
+    def _n(w: str) -> str:
+        nfkd = unicodedata.normalize("NFKD", w)
+        return re.sub(r"[^a-z0-9]", "", "".join(
+            c for c in nfkd if not unicodedata.combining(c)
+        ).lower())
+
+    artist_words = [_n(w) for w in artist_name.split() if re.search(r"[a-zA-Z]", w)]
+    if not artist_words:
+        return text
+    n = len(artist_words)
+    tokens = text.split()
+    if len(tokens) <= n:
+        return text
+    prefix = [_n(t) for t in tokens[:n]]
+    if sorted(prefix) == sorted(artist_words):
+        return " ".join(tokens[n:]).lstrip(",-–—· ").strip()
+    return text
+
+
 def _desc_matches_artist(artist_norm: str, desc_norm: str) -> bool:
     """True iff desc_norm plausibly refers to the queried artist.
 
@@ -264,7 +290,7 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
         house = sale_map.get(raw.get("sale_id"), "Drouot")
         currency = CURRENCY_SYMBOL.get(raw["currency_id"], raw["currency_id"]) or None
         desc = raw["description"]
-        title = _parse_title(desc)[:200]
+        title = _strip_artist_prefix(_parse_title(desc), raw["artist_name"])[:200]
         dimensions = _extract_dimensions(desc)
 
         lots.append(Lot(
