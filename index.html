@@ -63,10 +63,27 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-like:hover{transform:scale(1.2)}
 .card-wrap{position:relative}
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
+/* By Size layout */
+#grid.grid-bysize{grid-template-columns:repeat(6,1fr)}
+#grid.grid-bysize .card-wrap{grid-column:span 2}
+#grid.grid-bysize .card-wrap.sz-xs{grid-column:span 1}
+#grid.grid-bysize .card-wrap.sz-s{grid-column:span 2}
+#grid.grid-bysize .card-wrap.sz-m{grid-column:span 3}
+#grid.grid-bysize .card-wrap.sz-l{grid-column:span 4}
+#grid.grid-bysize .card-wrap.sz-xl{grid-column:span 6}
+#grid.grid-bysize .card-img-link{aspect-ratio:1}
+#grid.grid-bysize .card-img-ph{aspect-ratio:1}
+@media(max-width:900px){
+  #grid.grid-bysize{grid-template-columns:repeat(4,1fr)}
+  #grid.grid-bysize .card-wrap.sz-l{grid-column:span 3}
+  #grid.grid-bysize .card-wrap.sz-xl{grid-column:span 4}
+}
 @media(max-width:600px){
   #bar,#price-bar,#add-bar{padding:10px 14px}
   #grid{padding:14px;gap:10px}
   #add-input{width:180px}
+  #grid.grid-bysize{grid-template-columns:repeat(2,1fr)}
+  #grid.grid-bysize .card-wrap{grid-column:span 1!important}
 }
 </style>
 </head>
@@ -74,7 +91,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
 <header>
   <h1>Auction Watch</h1>
-  <p class="meta">Sunday, May 31, 2026&nbsp;&middot; 437 at auction</p>
+  <p class="meta">Sunday, May 31, 2026&nbsp;&middot; 427 at auction</p>
 </header>
 
 <div id="bar">
@@ -83,6 +100,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <button class="chip" data-artist="Ai Weiwei">Ai Weiwei</button>
   <button class="chip" data-artist="Albert Renger-Patzsch">Albert Renger-Patzsch</button>
   <button class="chip" data-artist="Andreas Gursky">Andreas Gursky</button>
+  <button class="chip" data-artist="Andy Gilmore">Andy Gilmore</button>
   <button class="chip" data-artist="Anne Imhof">Anne Imhof</button>
   <button class="chip" data-artist="Anselm Reyle">Anselm Reyle</button>
   <button class="chip" data-artist="Carl Grossberg">Carl Grossberg</button>
@@ -90,6 +108,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <button class="chip" data-artist="Damien Hirst">Damien Hirst</button>
   <button class="chip" data-artist="David Cook">David Cook</button>
   <button class="chip" data-artist="Eberhard Havekost">Eberhard Havekost</button>
+  <button class="chip" data-artist="Ed Atkins">Ed Atkins</button>
   <button class="chip" data-artist="Erwin Wurm">Erwin Wurm</button>
   <button class="chip" data-artist="Franz Radziwill">Franz Radziwill</button>
   <button class="chip" data-artist="George Condo">George Condo</button>
@@ -99,6 +118,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <button class="chip" data-artist="Jake & Dinos Chapman">Jake & Dinos Chapman</button>
   <button class="chip" data-artist="James Turrell">James Turrell</button>
   <button class="chip" data-artist="Jeff Koons">Jeff Koons</button>
+  <button class="chip" data-artist="Jeffrey Gibson">Jeffrey Gibson</button>
   <button class="chip" data-artist="Jessie Homer French">Jessie Homer French</button>
   <button class="chip" data-artist="Johannes Itten">Johannes Itten</button>
   <button class="chip" data-artist="Johannes Wohnseifer">Johannes Wohnseifer</button>
@@ -116,10 +136,13 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <button class="chip" data-artist="Norbert Bisky">Norbert Bisky</button>
   <button class="chip" data-artist="Olafur Eliasson">Olafur Eliasson</button>
   <button class="chip" data-artist="Pamela Rosenkranz">Pamela Rosenkranz</button>
+  <button class="chip" data-artist="Pol Taburet">Pol Taburet</button>
   <button class="chip" data-artist="Rinus Van de Velde">Rinus Van de Velde</button>
   <button class="chip" data-artist="Robert Gober">Robert Gober</button>
   <button class="chip" data-artist="Sergej Jensen">Sergej Jensen</button>
   <button class="chip" data-artist="Shirley Jaffe">Shirley Jaffe</button>
+  <button class="chip" data-artist="Silke Otto-Knapp">Silke Otto-Knapp</button>
+  <button class="chip" data-artist="Stephen G. Rhodes">Stephen G. Rhodes</button>
   <button class="chip" data-artist="Thomas Ruff">Thomas Ruff</button>
   <button class="chip" data-artist="Thomas Scheibitz">Thomas Scheibitz</button>
   <button class="chip" data-artist="Thomas Schütte">Thomas Schütte</button>
@@ -129,6 +152,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <button class="chip" data-artist="Tom Sachs">Tom Sachs</button>
   <button class="chip" data-artist="Vera Molnar">Vera Molnar</button>
   <button class="chip" data-artist="Victor Man">Victor Man</button>
+  <button class="chip" data-artist="Victor Siret">Victor Siret</button>
   <button class="chip" data-artist="Werner Tübke">Werner Tübke</button>
   <button class="chip" data-artist="Wolfgang Mattheuer">Wolfgang Mattheuer</button>
   <button class="chip" data-artist="Wolfgang Tillmans">Wolfgang Tillmans</button>
@@ -162,30 +186,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 </div>
 
 <main id="grid">
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Damien Hirst"
-    data-date="2026-05-31T13:16:00+00:00"
-    data-house="Maison de ventes Good — Le tour du Monde par l'Affiche - Online"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://drouot.com/en/l/33476457-hirst-damien-damien-hirst-for-ever-sothebys-london-16-09">
-    <a href="https://drouot.com/en/l/33476457-hirst-damien-damien-hirst-for-ever-sothebys-london-16-09" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=1686/180103/b991a1132e6f2d4d4109cf71ca74944d" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/damien-hirst" target="_blank" rel="noopener">Damien Hirst</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33476457-hirst-damien-damien-hirst-for-ever-sothebys-london-16-09" target="_blank" rel="noopener">Damien Hirst For Ever Sotheby's London 16 09 2008 Affiche signée au marker par Damien Hirst Affiche entoilée/ Vintage Poster on Linnen T.B.E. A - déchirures restaurées / tears restored DAMIEN HIRST 84</a></div>
-      <div class="card-house">Maison de ventes Good — Le tour du Monde par l'Affiche - Online</div>
-      <div class="card-estimate">€1,000–2,000</div>
-      
-      <div class="card-date">Closes Sun May 31, 13:16 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
   
   <div class="card-wrap">
   <article class="card"
@@ -818,17 +818,17 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     data-house="Heritage Auctions: Urban Art Showcase Auction featuring works from Graffiti Prints"
     data-price=""
     data-currency="€"
-    data-area="3636"
-    data-url="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10">
-    <a href="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/pb8ntADPo1HZpVxewyzF9A/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area=""
+    data-url="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works">
+    <a href="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/upPfEdXZVR6Cpc2GV0oKrw/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
       <div class="card-artist"><a href="https://www.artsy.net/artist/ai-weiwei" target="_blank" rel="noopener">Ai Weiwei</a></div>
-      <div class="card-title"><a href="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10" target="_blank" rel="noopener">Middle Finger (Red)</a></div>
+      <div class="card-title"><a href="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works" target="_blank" rel="noopener">Mask - Free Speech (twenty works)</a></div>
       <div class="card-house">Heritage Auctions: Urban Art Showcase Auction featuring works from Graffiti Prints</div>
       <div class="card-estimate">Estimate not published</div>
-      <div class="card-dims">60.3 × 60.3 cm</div>
+      
       <div class="card-date">Closes Tue Jun 2, 14:49 UTC</div>
     </div>
   </article>
@@ -842,17 +842,17 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     data-house="Heritage Auctions: Urban Art Showcase Auction featuring works from Graffiti Prints"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works">
-    <a href="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/upPfEdXZVR6Cpc2GV0oKrw/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="3636"
+    data-url="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10">
+    <a href="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/pb8ntADPo1HZpVxewyzF9A/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
       <div class="card-artist"><a href="https://www.artsy.net/artist/ai-weiwei" target="_blank" rel="noopener">Ai Weiwei</a></div>
-      <div class="card-title"><a href="https://www.artsy.net/artwork/ai-weiwei-mask-free-speech-twenty-works" target="_blank" rel="noopener">Mask - Free Speech (twenty works)</a></div>
+      <div class="card-title"><a href="https://www.artsy.net/artwork/ai-weiwei-middle-finger-red-10" target="_blank" rel="noopener">Middle Finger (Red)</a></div>
       <div class="card-house">Heritage Auctions: Urban Art Showcase Auction featuring works from Graffiti Prints</div>
       <div class="card-estimate">Estimate not published</div>
-      
+      <div class="card-dims">60.3 × 60.3 cm</div>
       <div class="card-date">Closes Tue Jun 2, 14:49 UTC</div>
     </div>
   </article>
@@ -1574,30 +1574,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-estimate">HK$50,000–70,000</div>
       
       <div class="card-date">Closes Wed Jun 3, 18:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Jeff Koons"
-    data-date="2026-06-03T19:10:00+00:00"
-    data-house="Drouot Estimations — Arts du XXème, Art contemporain & Design"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://drouot.com/en/l/33788362-dapres-jeff-koons-black-rabbit-epreuve-en-resine-coulee-a">
-    <a href="https://drouot.com/en/l/33788362-dapres-jeff-koons-black-rabbit-epreuve-en-resine-coulee-a" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=58/181098/08c896b3fea87987c23587e939f241b1" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/jeff-koons" target="_blank" rel="noopener">Jeff Koons</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33788362-dapres-jeff-koons-black-rabbit-epreuve-en-resine-coulee-a" target="_blank" rel="noopener">D'après Jeff KOONS Black Rabbit. Épreuve en résine coulée à froid et chromée. Haut. : 27,8 cm. Coffret d'origine. Un certificat d'authenticité numéroté 131/500 sera remis à l'acquéreur.</a></div>
-      <div class="card-house">Drouot Estimations — Arts du XXème, Art contemporain & Design</div>
-      <div class="card-estimate">€700–900</div>
-      
-      <div class="card-date">Closes Wed Jun 3, 19:10 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -2901,30 +2877,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Jeff Koons"
-    data-date="2026-06-04T21:48:00+00:00"
-    data-house="Vanguarts Auctions: Contemporary Discoveries: The Collection Continues"
-    data-price=""
-    data-currency="€"
-    data-area="1600"
-    data-url="https://www.artsy.net/artwork/jeff-koons-blue-balloon-dog-skatedeck-4">
-    <a href="https://www.artsy.net/artwork/jeff-koons-blue-balloon-dog-skatedeck-4" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/pRL30BzYR2OQy3ktW_hUsA/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/jeff-koons" target="_blank" rel="noopener">Jeff Koons</a></div>
-      <div class="card-title"><a href="https://www.artsy.net/artwork/jeff-koons-blue-balloon-dog-skatedeck-4" target="_blank" rel="noopener">Blue Balloon Dog Skatedeck</a></div>
-      <div class="card-house">Vanguarts Auctions: Contemporary Discoveries: The Collection Continues</div>
-      <div class="card-estimate">$500–800</div>
-      <div class="card-dims">80 × 20 cm</div>
-      <div class="card-date">Closes Thu Jun 4, 21:48 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
     data-artist="Helen Frankenthaler"
     data-date="2026-06-04T22:00:00+00:00"
     data-house="Vanguarts Auctions: Contemporary Discoveries: The Collection Continues"
@@ -3645,6 +3597,294 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
+    data-artist="Jeffrey Gibson"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="1379"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/668-ralph-gibson.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/668-ralph-gibson.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-668-Ralph-Gibson-Christine-from.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/jeffrey-gibson" target="_blank" rel="noopener">Jeffrey Gibson</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/668-ralph-gibson.html" target="_blank" rel="noopener">Christine (from the series: Infanta)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€1,500–2,000</div>
+      <div class="card-dims">45.5 × 30.3 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Jeffrey Gibson"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="697"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/655-ralph-gibson.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/655-ralph-gibson.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-655-Ralph-Gibson-Untitled-from-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/jeffrey-gibson" target="_blank" rel="noopener">Jeffrey Gibson</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/655-ralph-gibson.html" target="_blank" rel="noopener">Untitled (from the series: Quadrants)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€900–1,200</div>
+      <div class="card-dims">22 × 31.7 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Jeffrey Gibson"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="685"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/667-ralph-gibson.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/667-ralph-gibson.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-667-Ralph-Gibson-Untitled-from-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/jeffrey-gibson" target="_blank" rel="noopener">Jeffrey Gibson</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/667-ralph-gibson.html" target="_blank" rel="noopener">Untitled (from the series: Infanta)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€900–1,200</div>
+      <div class="card-dims">21.4 × 32 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/639-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/639-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-639-Stephen-Shore-Holden-Street-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/639-stephen-shore.html" target="_blank" rel="noopener">Holden Street, North Adams, Massachusetts, July 13, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/644-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/644-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-644-Stephen-Shore-U-S-10-Post-F.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/644-stephen-shore.html" target="_blank" rel="noopener">U.S. 10, Post Falls, Idaho, August 25, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/640-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/640-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-640-Stephen-Shore-West-Fifteenth-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/640-stephen-shore.html" target="_blank" rel="noopener">West Fifteenth Street and Vine Street, Cincinnatti, Ohio, May 15, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/642-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/642-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-642-Stephen-Shore-Marland-Street-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/642-stephen-shore.html" target="_blank" rel="noopener">Marland Street, Hobbs, New Mexico, February 19, 1975</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/641-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/641-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-641-Stephen-Shore-Lincoln-Street-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/641-stephen-shore.html" target="_blank" rel="noopener">Lincoln Street and Riverside Street, Spokane, Washington, August 25, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/638-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/638-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-638-Stephen-Shore-Presidio-Texas.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/638-stephen-shore.html" target="_blank" rel="noopener">Presidio, Texas, February 21, 1975</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/643-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/643-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-643-Stephen-Shore-El-Paso-Street-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/643-stephen-shore.html" target="_blank" rel="noopener">El Paso Street, El Paso, Texas, July 5, 1975</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/636-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/636-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-636-Stephen-Shore-Winnipeg-Manit.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/636-stephen-shore.html" target="_blank" rel="noopener">Winnipeg, Manitobe, August 16, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€2,000–3,000</div>
+      
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Stephen G. Rhodes"
+    data-date="2026-06-05T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="514"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1290-1/637-stephen-shore.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1290-1/637-stephen-shore.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1290-637-Stephen-Shore-U-S-1-Arundel.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/stephen-g-rhodes" target="_blank" rel="noopener">Stephen G. Rhodes</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1290-1/637-stephen-shore.html" target="_blank" rel="noopener">U.S. 1, Arundel, Maine, July 17, 1974</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€2,500–3,000</div>
+      <div class="card-dims">20.3 × 25.3 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
     data-artist="Anselm Reyle"
     data-date="2026-06-05T14:00:00+00:00"
     data-house="Grisebach"
@@ -3958,94 +4198,22 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <div class="card-wrap">
   <article class="card"
     data-artist="Cosima von Bonin"
-    data-date="2026-06-05T16:00:00+00:00"
+    data-date="2026-06-05T18:00:00+01:00"
     data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/cosima-von-bonin-doc-daffy-2025-24-c-5c376b3edb">
-    <a href="https://www.invaluable.com/auction-lot/cosima-von-bonin-doc-daffy-2025-24-c-5c376b3edb" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/08/812808/H0684-L437032440.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/cosima-von-bonin" target="_blank" rel="noopener">Cosima von Bonin</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/cosima-von-bonin-doc-daffy-2025-24-c-5c376b3edb" target="_blank" rel="noopener">Doc Daffy, 2025</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€20,000–30,000</div>
-      
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Cosima von Bonin"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/cosima-von-bonin-dandy-doc-the-apprentice-5-2009-23-c-f3eea3e377">
-    <a href="https://www.invaluable.com/auction-lot/cosima-von-bonin-dandy-doc-the-apprentice-5-2009-23-c-f3eea3e377" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/08/812808/H0684-L437032439.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/cosima-von-bonin" target="_blank" rel="noopener">Cosima von Bonin</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/cosima-von-bonin-dandy-doc-the-apprentice-5-2009-23-c-f3eea3e377" target="_blank" rel="noopener">Dandy Doc (The Apprentice # 5), 2009</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€30,000–50,000</div>
-      
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Cosima von Bonin"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="8000"
-    data-url="https://drouot.com/en/l/33520658-cosima-von-bonin-doc-daffy-2025-velours-coton-et-intisse-100">
-    <a href="https://drouot.com/en/l/33520658-cosima-von-bonin-doc-daffy-2025-velours-coton-et-intisse-100" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179808/9872aff9e8e1a1c2c1d20857d3ae2e57" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/cosima-von-bonin" target="_blank" rel="noopener">Cosima von Bonin</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520658-cosima-von-bonin-doc-daffy-2025-velours-coton-et-intisse-100" target="_blank" rel="noopener">Cosima von Bonin Doc Daffy 2025 Velours, coton et intissé 100 x 80 cm. Signé, daté et titré 'Cosima Bonin 2025 Doc Daffy' au dos du châssis et dédicacé. Provenance Directement par l'artiste ; collecti</a></div>
-      <div class="card-house">Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€20,000–30,000</div>
-      <div class="card-dims">100 × 80 cm</div>
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Cosima von Bonin"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst"
     data-price=""
     data-currency="€"
     data-area="31008"
-    data-url="https://drouot.com/en/l/33520657-cosima-von-bonin-dandy-doc-the-apprentice-5-2009-laine-coton">
-    <a href="https://drouot.com/en/l/33520657-cosima-von-bonin-dandy-doc-the-apprentice-5-2009-laine-coton" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179808/a1e94c418fe4c603a31ef9122dede453" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/23-cosima-von-bonin.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/23-cosima-von-bonin.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-23-Cosima-von-Bonin-Dandy-Doc-The-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
       <div class="card-artist"><a href="https://www.artsy.net/artist/cosima-von-bonin" target="_blank" rel="noopener">Cosima von Bonin</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520657-cosima-von-bonin-dandy-doc-the-apprentice-5-2009-laine-coton" target="_blank" rel="noopener">Cosima von Bonin Dandy Doc (The Apprentice # 5) 2009 Laine, coton et toison sur toile 204 x 152 cm. Signé et daté 'Cosima Bonin 2009' au dos de la toile. Provenance Directement par l'artiste ; collect</a></div>
-      <div class="card-house">Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst</div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/23-cosima-von-bonin.html" target="_blank" rel="noopener">Dandy Doc (The Apprentice # 5)</a></div>
+      <div class="card-house">Lempertz</div>
       <div class="card-estimate">€30,000–50,000</div>
       <div class="card-dims">204 × 152 cm</div>
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4053,23 +4221,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-05T16:00:00+00:00"
+    data-artist="Cosima von Bonin"
+    data-date="2026-06-05T18:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/franz-radziwill-der-winter-ist-schon-1963-40-c-1dba63e623">
-    <a href="https://www.invaluable.com/auction-lot/franz-radziwill-der-winter-ist-schon-1963-40-c-1dba63e623" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/08/812808/H0684-L437032495.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="8000"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/24-cosima-von-bonin.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/24-cosima-von-bonin.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-24-Cosima-von-Bonin-Doc-Daffy.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/franz-radziwill-der-winter-ist-schon-1963-40-c-1dba63e623" target="_blank" rel="noopener">Der Winter ist schön, 1963</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/cosima-von-bonin" target="_blank" rel="noopener">Cosima von Bonin</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/24-cosima-von-bonin.html" target="_blank" rel="noopener">Doc Daffy</a></div>
       <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€50,000–70,000</div>
-      
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
+      <div class="card-estimate">€20,000–30,000</div>
+      <div class="card-dims">100 × 80 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4077,23 +4245,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-05T16:00:00+00:00"
+    data-artist="Ed Atkins"
+    data-date="2026-06-05T18:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/franz-radziwill-bauerndorf-verso-stehender-akt-mit-huhnern-1923-recto-resp-1920-1921-verso-39-c-4e38265e6f">
-    <a href="https://www.invaluable.com/auction-lot/franz-radziwill-bauerndorf-verso-stehender-akt-mit-huhnern-1923-recto-resp-1920-1921-verso-39-c-4e38265e6f" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/08/812808/H0684-L437032496.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="950"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/10-eduardo-chillida.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/10-eduardo-chillida.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-10-Eduardo-Chillida-Oxido-G-196.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/franz-radziwill-bauerndorf-verso-stehender-akt-mit-huhnern-1923-recto-resp-1920-1921-verso-39-c-4e38265e6f" target="_blank" rel="noopener">Bauerndorf. Verso: Stehender Akt mit Hühnern, 1923 (recto) resp. 1920-1921 (verso)</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/ed-atkins" target="_blank" rel="noopener">Ed Atkins</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/10-eduardo-chillida.html" target="_blank" rel="noopener">Óxido G-196</a></div>
       <div class="card-house">Lempertz</div>
       <div class="card-estimate">€70,000–90,000</div>
-      
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
+      <div class="card-dims">29.5 × 32.2 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4102,94 +4270,22 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <div class="card-wrap">
   <article class="card"
     data-artist="Franz Radziwill"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="4727"
-    data-url="https://drouot.com/en/l/33520674-franz-radziwill-lhiver-est-beau-1963-huile-sur-toile-sur">
-    <a href="https://drouot.com/en/l/33520674-franz-radziwill-lhiver-est-beau-1963-huile-sur-toile-sur" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179808/a56f64bbf1ae6e45455affe8bdc5b4d7" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520674-franz-radziwill-lhiver-est-beau-1963-huile-sur-toile-sur" target="_blank" rel="noopener">Franz Radziwill L'hiver est beau 1963 Huile sur toile sur bois. 58,5 x 80,8 cm. Encadré par l'artiste. Signé en bas à droite en rouge 'Franz Radziwill'. Au dos, marqué en rouge-brun du numéro d'œuvre </a></div>
-      <div class="card-house">Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€50,000–70,000</div>
-      <div class="card-dims">58.5 × 80.8 cm</div>
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst"
+    data-date="2026-06-05T18:00:00+01:00"
+    data-house="Lempertz"
     data-price=""
     data-currency="€"
     data-area="6840"
-    data-url="https://drouot.com/en/l/33520673-franz-radziwill-village-de-paysans-au-verso-nu-debout-avec">
-    <a href="https://drouot.com/en/l/33520673-franz-radziwill-village-de-paysans-au-verso-nu-debout-avec" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179808/c6a6981957bc64f1ef3dff4aab2c2efa" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/39-franz-radziwill-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/39-franz-radziwill-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-39-Franz-Radziwill-Bauerndorf-Ver.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
       <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520673-franz-radziwill-village-de-paysans-au-verso-nu-debout-avec" target="_blank" rel="noopener">Franz Radziwill Village de paysans. Au verso : nu debout avec des poules. 1923 (recto) ou 1920-1921 (verso) Huile sur toile. 80 x 85,5 cm. Encadré par un cadre. En bas à droite, monogramme bleu foncé </a></div>
-      <div class="card-house">Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst</div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/39-franz-radziwill-1.html" target="_blank" rel="noopener">Bauerndorf. Verso: Stehender Akt mit Hühnern</a></div>
+      <div class="card-house">Lempertz</div>
       <div class="card-estimate">€70,000–90,000</div>
       <div class="card-dims">80 × 85.5 cm</div>
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Olafur Eliasson"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/olafur-eliasson-the-island-series-1997-50-c-8aafda3ca4">
-    <a href="https://www.invaluable.com/auction-lot/olafur-eliasson-the-island-series-1997-50-c-8aafda3ca4" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/08/812808/H0684-L437032591.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/olafur-eliasson" target="_blank" rel="noopener">Olafur Eliasson</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/olafur-eliasson-the-island-series-1997-50-c-8aafda3ca4" target="_blank" rel="noopener">The Island Series, 1997</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€30,000–40,000</div>
-      
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Olafur Eliasson"
-    data-date="2026-06-05T16:00:00+00:00"
-    data-house="Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="90160"
-    data-url="https://drouot.com/en/l/33520684-olafur-eliasson-la-serie-des-iles-1997-travail">
-    <a href="https://drouot.com/en/l/33520684-olafur-eliasson-la-serie-des-iles-1997-travail" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179808/70079940e6d5b3d782cd69f92571e061" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/olafur-eliasson" target="_blank" rel="noopener">Olafur Eliasson</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520684-olafur-eliasson-la-serie-des-iles-1997-travail" target="_blank" rel="noopener">Ólafur Eliasson La série des îles 1997 Travail photographique en 56 parties : C-prints sur Aludibond (réimpression 2021). 245 x 368 cm (installation). Avec étiquette d'artiste jointe, signée au feutre</a></div>
-      <div class="card-house">Lempertz — Evening Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€30,000–40,000</div>
-      <div class="card-dims">245 × 368 cm</div>
-      <div class="card-date">Closes Fri Jun 5, 16:00 UTC</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4198,22 +4294,22 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <div class="card-wrap">
   <article class="card"
     data-artist="Franz Radziwill"
-    data-date="2026-06-06T08:00:00+00:00"
+    data-date="2026-06-05T18:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-zwei-dosen-und-zwei-apfeln-circa-1950-200-c-a24829a7f0">
-    <a href="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-zwei-dosen-und-zwei-apfeln-circa-1950-200-c-a24829a7f0" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/05/812805/H0684-L437033063.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="4727"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/40-franz-radziwill.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/40-franz-radziwill.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-40-Franz-Radziwill-Der-Winter-ist-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
       <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-zwei-dosen-und-zwei-apfeln-circa-1950-200-c-a24829a7f0" target="_blank" rel="noopener">Stillleben mit zwei Dosen und zwei Äpfeln, Circa 1950</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/40-franz-radziwill.html" target="_blank" rel="noopener">Der Winter ist schön</a></div>
       <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€3,000–5,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 08:00 UTC</div>
+      <div class="card-estimate">€50,000–70,000</div>
+      <div class="card-dims">58.5 × 80.8 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4221,23 +4317,47 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-06T08:00:00+00:00"
+    data-artist="Olafur Eliasson"
+    data-date="2026-06-05T18:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
     data-area=""
-    data-url="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-gelber-kanne-und-rosa-krug-mit-blumen-1949-199-c-8e7fc89f60">
-    <a href="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-gelber-kanne-und-rosa-krug-mit-blumen-1949-199-c-8e7fc89f60" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/05/812805/H0684-L437033057.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/50-olafur-eliasson.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/50-olafur-eliasson.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-50-Olafur-Eliasson-The-Island-Seri.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/franz-radziwill-stillleben-mit-gelber-kanne-und-rosa-krug-mit-blumen-1949-199-c-8e7fc89f60" target="_blank" rel="noopener">Stillleben mit gelber Kanne und rosa Krug mit Blumen, 1949</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/olafur-eliasson" target="_blank" rel="noopener">Olafur Eliasson</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/50-olafur-eliasson.html" target="_blank" rel="noopener">The Island Series</a></div>
       <div class="card-house">Lempertz</div>
       <div class="card-estimate">€30,000–40,000</div>
       
-      <div class="card-date">Closes Sat Jun 6, 08:00 UTC</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Pol Taburet"
+    data-date="2026-06-05T18:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="6300"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1291-1/32-sigmar-polke-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1291-1/32-sigmar-polke-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1291-32-Sigmar-Polke-Untitled.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/pol-taburet" target="_blank" rel="noopener">Pol Taburet</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1291-1/32-sigmar-polke-1.html" target="_blank" rel="noopener">Untitled</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€100,000–150,000</div>
+      <div class="card-dims">90 × 70 cm</div>
+      <div class="card-date">Closes Fri Jun 5, 18:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4293,54 +4413,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="1449"
-    data-url="https://drouot.com/en/l/33520797-franz-radziwill-nature-morte-avec-deux-boites-et-deux-pommes">
-    <a href="https://drouot.com/en/l/33520797-franz-radziwill-nature-morte-avec-deux-boites-et-deux-pommes" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/ae39cbf16d429c1543a2e63042177359" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520797-franz-radziwill-nature-morte-avec-deux-boites-et-deux-pommes" target="_blank" rel="noopener">Franz Radziwill Nature morte avec deux boîtes et deux pommes Vers 1950 Aquarelle sur dessin préparatoire au crayon sur papier à dessin. 33 x 43,9 cm. Encadré sous verre. En bas à droite, signature à l</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€3,000–5,000</div>
-      <div class="card-dims">33 × 43.9 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Franz Radziwill"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="3126"
-    data-url="https://drouot.com/en/l/33520796-franz-radziwill-nature-morte-au-pot-jaune-et-a-la-cruche">
-    <a href="https://drouot.com/en/l/33520796-franz-radziwill-nature-morte-au-pot-jaune-et-a-la-cruche" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/6ac5c6fe32bc8eb6e76375d3bf489e90" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520796-franz-radziwill-nature-morte-au-pot-jaune-et-a-la-cruche" target="_blank" rel="noopener">Franz Radziwill Nature morte au pot jaune et à la cruche rose avec fleurs 1949 Huile sur toile sur bois. 62,4 x 50,1 cm. Encadré par l'artiste. Signé en bas à gauche en vert dans la représentation 'Fr</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€30,000–40,000</div>
-      <div class="card-dims">62.4 × 50.1 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
     data-artist="Johannes Itten"
     data-date="2026-06-06T09:00:00+00:00"
     data-house="Bassenge — Moderne und Zeitgenössische Kunst II"
@@ -4365,23 +4437,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Michel Majerus"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
+    data-artist="Franz Radziwill"
+    data-date="2026-06-06T11:00:00+01:00"
+    data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area="3600"
-    data-url="https://drouot.com/en/l/33520963-michel-majerus-sans-titre-2000-acrylique-sur-toile-60-x-60">
-    <a href="https://drouot.com/en/l/33520963-michel-majerus-sans-titre-2000-acrylique-sur-toile-60-x-60" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/473c79aaa3c7e8f063e46b5c3b78f9e9" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="3126"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-1/199-franz-radziwill.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-1/199-franz-radziwill.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-199-Franz-Radziwill-Stillleben-mit-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/michel-majerus" target="_blank" rel="noopener">Michel Majerus</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520963-michel-majerus-sans-titre-2000-acrylique-sur-toile-60-x-60" target="_blank" rel="noopener">Michel Majerus Sans titre 2000 Acrylique sur toile 60 x 60 cm. Signé et daté 'Majerus 00' au dos de la toile et inscrit '603'. - Avec traces d'atelier et légères traces d'âge. Provenance Galerie Monik</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€20,000–30,000</div>
-      <div class="card-dims">60 × 60 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-1/199-franz-radziwill.html" target="_blank" rel="noopener">Stillleben mit gelber Kanne und rosa Krug mit Blumen</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€30,000–40,000</div>
+      <div class="card-dims">62.4 × 50.1 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 11:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4389,215 +4461,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="792"
-    data-url="https://drouot.com/en/l/33520961-norbert-bisky-sixteen-2015-huile-sur-papier-33-x-24-cm">
-    <a href="https://drouot.com/en/l/33520961-norbert-bisky-sixteen-2015-huile-sur-papier-33-x-24-cm" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/2549d0f182d320f562d082609b7323c1" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520961-norbert-bisky-sixteen-2015-huile-sur-papier-33-x-24-cm" target="_blank" rel="noopener">Norbert Bisky Sixteen 2015 Huile sur papier 33 x 24 cm. Encadré sous verre. Signé, daté et titré '- sixteen - Bisky 23.9. 2015 -'. Le présent travail est enregistré dans le catalogue raisonné de l'art</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      <div class="card-dims">33 × 24 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="1271"
-    data-url="https://drouot.com/en/l/33520960-norbert-bisky-faiseur-de-pluie-2014-aquarelle-et-crayon-sur">
-    <a href="https://drouot.com/en/l/33520960-norbert-bisky-faiseur-de-pluie-2014-aquarelle-et-crayon-sur" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/f71418f75ab40457c53a05e48990273e" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520960-norbert-bisky-faiseur-de-pluie-2014-aquarelle-et-crayon-sur" target="_blank" rel="noopener">Norbert Bisky Faiseur de pluie 2014 Aquarelle et crayon sur carton 31 x 41 cm. Encadré sous verre. Signé, daté et titré '- Regenmacher - Bisky - 14.10.2014 -'. Le présent travail est enregistré dans l</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€6,000–8,000</div>
-      <div class="card-dims">31 × 41 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="432"
-    data-url="https://drouot.com/en/l/33520957-norbert-bisky-troisieme-oeil-2008-huile-sur-toile-24-x-18-cm">
-    <a href="https://drouot.com/en/l/33520957-norbert-bisky-troisieme-oeil-2008-huile-sur-toile-24-x-18-cm" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/41fe91b723b9c3ca1f3d0261cd523c6e" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520957-norbert-bisky-troisieme-oeil-2008-huile-sur-toile-24-x-18-cm" target="_blank" rel="noopener">Norbert Bisky Troisième œil 2008 Huile sur toile 24 x 18 cm. Signé et daté 'Bisky 2008' au dos de la toile et sur la toile retournée. Le présent travail est enregistré dans le catalogue raisonné de l'</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€8,000–12,000</div>
-      <div class="card-dims">24 × 18 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="468"
-    data-url="https://drouot.com/en/l/33520958-norbert-bisky-nous-sommes-les-filles-ii-2013-aquarelle-et">
-    <a href="https://drouot.com/en/l/33520958-norbert-bisky-nous-sommes-les-filles-ii-2013-aquarelle-et" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/d2cdb378e858faa769ceaafb0906564a" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520958-norbert-bisky-nous-sommes-les-filles-ii-2013-aquarelle-et" target="_blank" rel="noopener">Norbert Bisky Nous sommes les filles II 2013 Aquarelle et crayon sur carton 18 x 26 cm. Encadré sous verre. Signé, daté et titré 'Bisky - wir sind die Mädchen - II - 12.10.2013'. Le présent travail es</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      <div class="card-dims">18 × 26 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="3200"
-    data-url="https://drouot.com/en/l/33520959-norbert-bisky-ti-vorrei-2014-aquarelle-et-crayon-sur-carton">
-    <a href="https://drouot.com/en/l/33520959-norbert-bisky-ti-vorrei-2014-aquarelle-et-crayon-sur-carton" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/1d1879275bff9b3bfc211bd7d8b6c9ca" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520959-norbert-bisky-ti-vorrei-2014-aquarelle-et-crayon-sur-carton" target="_blank" rel="noopener">Norbert Bisky Ti Vorrei 2014 Aquarelle et crayon sur carton 64 x 50 cm. Encadré sous verre. Signé, daté et titré '-Ti Vorrei - Bisky - 2 mai 2014-'. Le présent travail est enregistré dans le catalogue</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€8,000–12,000</div>
-      <div class="card-dims">64 × 50 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Thomas Ruff"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="6241"
-    data-url="https://drouot.com/en/l/33520932-thomas-ruff-cas-20-de-la-serie-cassini-2009-c-print-monte-a">
-    <a href="https://drouot.com/en/l/33520932-thomas-ruff-cas-20-de-la-serie-cassini-2009-c-print-monte-a" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/4143e6ad054a70ffe7f3d21ba7d65a16" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520932-thomas-ruff-cas-20-de-la-serie-cassini-2009-c-print-monte-a" target="_blank" rel="noopener">Thomas Ruff cas 20 (de la série : Cassini) 2009 C-Print, monté à fleur sur Aludibond 2009. 79 x 79 cm (104 x 104 cm). Signé, daté, titré et numéroté au feutre au verso. Exemplaire 3/6. - Encadré sous </a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€5,000–6,000</div>
-      <div class="card-dims">79 × 79 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Thomas Ruff"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="5846"
-    data-url="https://drouot.com/en/l/33520933-thomas-ruff-cas-29-de-la-serie-cassini-2008-c-print-monte-a">
-    <a href="https://drouot.com/en/l/33520933-thomas-ruff-cas-29-de-la-serie-cassini-2008-c-print-monte-a" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/4f2f024289263108221e7d59ee6c3551" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520933-thomas-ruff-cas-29-de-la-serie-cassini-2008-c-print-monte-a" target="_blank" rel="noopener">Thomas Ruff cas 29 (de la série : Cassini) 2008 C-Print, monté à fleur sur Aludibond 2009. 74 x 79 cm (99 x 104 cm). Signé, daté, titré et numéroté au feutre au verso. Exemplaire 3/6. - Encadré sous p</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€5,000–6,000</div>
-      <div class="card-dims">74 × 79 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tobias Rehberger"
-    data-date="2026-06-06T09:00:00+00:00"
-    data-house="Lempertz — Day Sale - Moderne und Zeitgenössische Kunst"
-    data-price=""
-    data-currency="€"
-    data-area="2800"
-    data-url="https://drouot.com/en/l/33520944-tobias-rehberger-infection-3n6-2011-lampe-a-bande-velcro">
-    <a href="https://drouot.com/en/l/33520944-tobias-rehberger-infection-3n6-2011-lampe-a-bande-velcro" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=517/179811/5ed6533a59f7a7c108bfc0088303afff" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tobias-rehberger" target="_blank" rel="noopener">Tobias Rehberger</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33520944-tobias-rehberger-infection-3n6-2011-lampe-a-bande-velcro" target="_blank" rel="noopener">Tobias Rehberger Infection 3N6 2011 Lampe à bande Velcro : bande Velcro, câble et ampoule env. 50 x 56 x 64 cm. - Avec traces d'atelier. Provenance Galerie Bärbel Grässlin, Francfort ; collection priv</a></div>
-      <div class="card-house">Lempertz — Day Sale - Moderne und Zeitgenössische Kunst</div>
-      <div class="card-estimate">€6,000–8,000</div>
-      <div class="card-dims">50 × 56 cm</div>
-      <div class="card-date">Closes Sat Jun 6, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Michel Majerus"
-    data-date="2026-06-06T12:00:00+00:00"
+    data-artist="Franz Radziwill"
+    data-date="2026-06-06T11:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
     data-area=""
-    data-url="https://www.invaluable.com/auction-lot/michel-majerus-untitled-2000-408-c-cdcd8c2ad6">
-    <a href="https://www.invaluable.com/auction-lot/michel-majerus-untitled-2000-408-c-cdcd8c2ad6" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033638.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-1/200-franz-radziwill.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-1/200-franz-radziwill.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-200-Franz-Radziwill-Stillleben-mit-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/michel-majerus" target="_blank" rel="noopener">Michel Majerus</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/michel-majerus-untitled-2000-408-c-cdcd8c2ad6" target="_blank" rel="noopener">Untitled, 2000</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/franz-radziwill" target="_blank" rel="noopener">Franz Radziwill</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-1/200-franz-radziwill.html" target="_blank" rel="noopener">Stillleben mit zwei Dosen und zwei Äpfeln</a></div>
       <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€20,000–30,000</div>
+      <div class="card-estimate">€3,000–5,000</div>
       
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
+      <div class="card-date">Closes Sat Jun 6, 11:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4605,23 +4485,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T12:00:00+00:00"
+    data-artist="Andy Gilmore"
+    data-date="2026-06-06T14:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/norbert-bisky-sixteen-2015-406-c-506cebdd9f">
-    <a href="https://www.invaluable.com/auction-lot/norbert-bisky-sixteen-2015-406-c-506cebdd9f" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033634.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="68"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/417-andy-warhol.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/417-andy-warhol.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-417-Andy-Warhol-Torso.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/norbert-bisky-sixteen-2015-406-c-506cebdd9f" target="_blank" rel="noopener">Sixteen, 2015</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/andy-gilmore" target="_blank" rel="noopener">Andy Gilmore</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/417-andy-warhol.html" target="_blank" rel="noopener">Torso</a></div>
       <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
+      <div class="card-estimate">€4,000–5,000</div>
+      <div class="card-dims">9.4 × 7.2 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4629,167 +4509,23 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T12:00:00+00:00"
+    data-artist="Andy Gilmore"
+    data-date="2026-06-06T14:00:00+01:00"
     data-house="Lempertz"
     data-price=""
     data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/norbert-bisky-third-eye-2008-402-c-f7d55d7898">
-    <a href="https://www.invaluable.com/auction-lot/norbert-bisky-third-eye-2008-402-c-f7d55d7898" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033628.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    data-area="68"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/416-andy-warhol.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/416-andy-warhol.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-416-Andy-Warhol-Torso.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
     </a>
     <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/norbert-bisky-third-eye-2008-402-c-f7d55d7898" target="_blank" rel="noopener">Third Eye, 2008</a></div>
+      <div class="card-artist"><a href="https://www.artsy.net/artist/andy-gilmore" target="_blank" rel="noopener">Andy Gilmore</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/416-andy-warhol.html" target="_blank" rel="noopener">Torso</a></div>
       <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€8,000–12,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/norbert-bisky-regenmacher-2013-405-c-00bc819807">
-    <a href="https://www.invaluable.com/auction-lot/norbert-bisky-regenmacher-2013-405-c-00bc819807" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033630.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/norbert-bisky-regenmacher-2013-405-c-00bc819807" target="_blank" rel="noopener">Regenmacher, 2013</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€6,000–8,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/norbert-bisky-ti-vorrei-2014-404-c-182d125830">
-    <a href="https://www.invaluable.com/auction-lot/norbert-bisky-ti-vorrei-2014-404-c-182d125830" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033629.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/norbert-bisky-ti-vorrei-2014-404-c-182d125830" target="_blank" rel="noopener">Ti Vorrei, 2014</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€8,000–12,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Norbert Bisky"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/norbert-bisky-wir-sind-die-madchen-ii-2013-403-c-1fffef5f60">
-    <a href="https://www.invaluable.com/auction-lot/norbert-bisky-wir-sind-die-madchen-ii-2013-403-c-1fffef5f60" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033623.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/norbert-bisky-wir-sind-die-madchen-ii-2013-403-c-1fffef5f60" target="_blank" rel="noopener">Wir sind die Mädchen II, 2013</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Thomas Ruff"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/thomas-ruff-cas-29-from-the-series-cassini-2008-379-c-4243a35155">
-    <a href="https://www.invaluable.com/auction-lot/thomas-ruff-cas-29-from-the-series-cassini-2008-379-c-4243a35155" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033539.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/thomas-ruff-cas-29-from-the-series-cassini-2008-379-c-4243a35155" target="_blank" rel="noopener">cas 29 (from the series: Cassini), 2008</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€5,000–6,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Thomas Ruff"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/thomas-ruff-cas-20-from-the-series-cassini-2009-378-c-eddd7cd98a">
-    <a href="https://www.invaluable.com/auction-lot/thomas-ruff-cas-20-from-the-series-cassini-2009-378-c-eddd7cd98a" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033540.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/thomas-ruff-cas-20-from-the-series-cassini-2009-378-c-eddd7cd98a" target="_blank" rel="noopener">cas 20 (from the series: Cassini), 2009</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€5,000–6,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tobias Rehberger"
-    data-date="2026-06-06T12:00:00+00:00"
-    data-house="Lempertz"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.invaluable.com/auction-lot/tobias-rehberger-infection-3n6-2011-390-c-4165377b33">
-    <a href="https://www.invaluable.com/auction-lot/tobias-rehberger-infection-3n6-2011-390-c-4165377b33" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://image.invaluable.com/hermes/Lempertz/06/812806/H0684-L437033576.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tobias-rehberger" target="_blank" rel="noopener">Tobias Rehberger</a></div>
-      <div class="card-title"><a href="https://www.invaluable.com/auction-lot/tobias-rehberger-infection-3n6-2011-390-c-4165377b33" target="_blank" rel="noopener">Infection 3N6, 2011</a></div>
-      <div class="card-house">Lempertz</div>
-      <div class="card-estimate">€6,000–8,000</div>
-      
-      <div class="card-date">Closes Sat Jun 6, 12:00 UTC</div>
+      <div class="card-estimate">€4,000–5,000</div>
+      <div class="card-dims">9.4 × 7.2 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -4814,6 +4550,390 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-estimate">€800–1,000</div>
       
       <div class="card-date">Closes Sat Jun 6, 13:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Michel Majerus"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="3600"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/408-michel-majerus.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/408-michel-majerus.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-408-Michel-Majerus-Untitled.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/michel-majerus" target="_blank" rel="noopener">Michel Majerus</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/408-michel-majerus.html" target="_blank" rel="noopener">Untitled</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€20,000–30,000</div>
+      <div class="card-dims">60 × 60 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Norbert Bisky"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="432"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/402-norbert-bisky.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/402-norbert-bisky.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-402-Norbert-Bisky-Third-Eye.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/402-norbert-bisky.html" target="_blank" rel="noopener">Third Eye</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€8,000–12,000</div>
+      <div class="card-dims">24 × 18 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Norbert Bisky"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="3200"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/404-norbert-bisky.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/404-norbert-bisky.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-404-Norbert-Bisky-Ti-Vorrei.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/404-norbert-bisky.html" target="_blank" rel="noopener">Ti Vorrei</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€8,000–12,000</div>
+      <div class="card-dims">64 × 50 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Norbert Bisky"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="1271"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/405-norbert-bisky.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/405-norbert-bisky.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-405-Norbert-Bisky-Regenmacher.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/405-norbert-bisky.html" target="_blank" rel="noopener">Regenmacher</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€6,000–8,000</div>
+      <div class="card-dims">31 × 41 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Norbert Bisky"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="468"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/403-norbert-bisky.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/403-norbert-bisky.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-403-Norbert-Bisky-Wir-sind-die-Mae.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/403-norbert-bisky.html" target="_blank" rel="noopener">Wir sind die Mädchen II</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–7,000</div>
+      <div class="card-dims">18 × 26 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Norbert Bisky"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="792"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/406-norbert-bisky.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/406-norbert-bisky.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-406-Norbert-Bisky-Sixteen.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/norbert-bisky" target="_blank" rel="noopener">Norbert Bisky</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/406-norbert-bisky.html" target="_blank" rel="noopener">Sixteen</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–7,000</div>
+      <div class="card-dims">33 × 24 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Pol Taburet"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="620"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/351-sigmar-polke-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/351-sigmar-polke-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-351-Sigmar-Polke-Tut-doch-WAS-.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/pol-taburet" target="_blank" rel="noopener">Pol Taburet</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/351-sigmar-polke-1.html" target="_blank" rel="noopener">Tut doch WAS!</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–7,000</div>
+      <div class="card-dims">29.5 × 21 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Pol Taburet"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="7000"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/352-sigmar-polke-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/352-sigmar-polke-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-352-Sigmar-Polke-Experiment-I-IV.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/pol-taburet" target="_blank" rel="noopener">Pol Taburet</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/352-sigmar-polke-1.html" target="_blank" rel="noopener">Experiment I-IV</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€4,000–6,000</div>
+      <div class="card-dims">70 × 100 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Pol Taburet"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="428"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/350-sigmar-polke-2.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/350-sigmar-polke-2.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-350-Sigmar-Polke-Untitled-Kirch.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/pol-taburet" target="_blank" rel="noopener">Pol Taburet</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/350-sigmar-polke-2.html" target="_blank" rel="noopener">Untitled (Kirchfeldstrasse, Dusseldorf)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€3,000–4,000</div>
+      <div class="card-dims">23.8 × 18 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Silke Otto-Knapp"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="2133"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/305-karl-otto-goetz.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/305-karl-otto-goetz.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-305-Karl-Otto-Goetz-Untitled.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/silke-otto-knapp" target="_blank" rel="noopener">Silke Otto-Knapp</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/305-karl-otto-goetz.html" target="_blank" rel="noopener">Untitled</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€8,000–10,000</div>
+      <div class="card-dims">39.5 × 54 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Silke Otto-Knapp"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="3250"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/303-karl-otto-goetz-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/303-karl-otto-goetz-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-303-Karl-Otto-Goetz-Untitled.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/silke-otto-knapp" target="_blank" rel="noopener">Silke Otto-Knapp</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/303-karl-otto-goetz-1.html" target="_blank" rel="noopener">Untitled</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€6,000–8,000</div>
+      <div class="card-dims">65 × 50 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Silke Otto-Knapp"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="2106"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/304-karl-otto-goetz-1.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/304-karl-otto-goetz-1.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-304-Karl-Otto-Goetz-Tilbo-I.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/silke-otto-knapp" target="_blank" rel="noopener">Silke Otto-Knapp</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/304-karl-otto-goetz-1.html" target="_blank" rel="noopener">Tilbo I</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–6,000</div>
+      <div class="card-dims">54 × 39 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Thomas Ruff"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/379-thomas-ruff.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/379-thomas-ruff.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-379-Thomas-Ruff-cas-29-from-th.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/379-thomas-ruff.html" target="_blank" rel="noopener">cas 29 (from the series: Cassini)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–6,000</div>
+      
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Thomas Ruff"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area=""
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/378-thomas-ruff.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/378-thomas-ruff.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-378-Thomas-Ruff-cas-20-from-th.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/thomas-ruff" target="_blank" rel="noopener">Thomas Ruff</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/378-thomas-ruff.html" target="_blank" rel="noopener">cas 20 (from the series: Cassini)</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€5,000–6,000</div>
+      
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Tobias Rehberger"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="2800"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/390-tobias-rehberger.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/390-tobias-rehberger.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-390-Tobias-Rehberger-Infection-3N6.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/tobias-rehberger" target="_blank" rel="noopener">Tobias Rehberger</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/390-tobias-rehberger.html" target="_blank" rel="noopener">Infection 3N6</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€6,000–8,000</div>
+      <div class="card-dims">50 × 56 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
+    </div>
+  </article>
+  <button class="card-like" aria-label="Like">&#9825;</button>
+  </div>
+  
+  <div class="card-wrap">
+  <article class="card"
+    data-artist="Victor Siret"
+    data-date="2026-06-06T14:00:00+01:00"
+    data-house="Lempertz"
+    data-price=""
+    data-currency="€"
+    data-area="1505"
+    data-url="https://www.lempertz.com/en/catalogues/lot/1292-2/323-victor-vasarely.html">
+    <a href="https://www.lempertz.com/en/catalogues/lot/1292-2/323-victor-vasarely.html" target="_blank" rel="noopener" class="card-img-link">
+      <img class="card-img" src="https://www.lempertz.com/lempertz_api/images/large/1292-323-Victor-Vasarely-Leire.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+    </a>
+    <div class="card-body">
+      <div class="card-artist"><a href="https://www.artsy.net/artist/victor-siret" target="_blank" rel="noopener">Victor Siret</a></div>
+      <div class="card-title"><a href="https://www.lempertz.com/en/catalogues/lot/1292-2/323-victor-vasarely.html" target="_blank" rel="noopener">Leire</a></div>
+      <div class="card-house">Lempertz</div>
+      <div class="card-estimate">€15,000–20,000</div>
+      <div class="card-dims">43 × 35 cm</div>
+      <div class="card-date">Closes Sat Jun 6, 14:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -5998,30 +6118,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   <div class="card-wrap">
   <article class="card"
     data-artist="Damien Hirst"
-    data-date="2026-06-10T15:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Eveningsale"
-    data-price=""
-    data-currency="€"
-    data-area="556"
-    data-url="https://drouot.com/en/l/33790457-hirst-damien-1965-bristol-titre-sans-titre-technique-crayon">
-    <a href="https://drouot.com/en/l/33790457-hirst-damien-1965-bristol-titre-sans-titre-technique-crayon" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174205/628d441fa53aadf8b178138f95a6ab0a" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/damien-hirst" target="_blank" rel="noopener">Damien Hirst</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790457-hirst-damien-1965-bristol-titre-sans-titre-technique-crayon" target="_blank" rel="noopener">Sans titre</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Eveningsale</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      <div class="card-dims">28.5 × 19.5 cm</div>
-      <div class="card-date">Closes Wed Jun 10, 15:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Damien Hirst"
     data-date="2026-06-10T15:09:00+00:00"
     data-house="Van Ham — Evening Sale"
     data-price=""
@@ -6237,30 +6333,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   
   <div class="card-wrap">
   <article class="card"
-    data-artist="Carl Grossberg"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="24512"
-    data-url="https://drouot.com/en/l/33790556-grossberg-carl-1894-elberfeld-wuppertal-1940-combiegne-pres">
-    <a href="https://drouot.com/en/l/33790556-grossberg-carl-1894-elberfeld-wuppertal-1940-combiegne-pres" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/a9339c402eab7e97be85b6d555ad554a" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/carl-grossberg" target="_blank" rel="noopener">Carl Grossberg</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790556-grossberg-carl-1894-elberfeld-wuppertal-1940-combiegne-pres" target="_blank" rel="noopener">Rue du marché à Bad Tölz</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€20,000–30,000</div>
-      <div class="card-dims">64 × 383 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
     data-artist="Damien Hirst"
     data-date="2026-06-11T09:00:00+00:00"
     data-house="Martel Maides"
@@ -6301,246 +6373,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-house">Martel Maides</div>
       <div class="card-estimate">£500–700</div>
       
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Rinus Van de Velde"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="3575"
-    data-url="https://drouot.com/en/l/33790690-velde-rinus-van-de-1983-leuven-titre-a-silent-approach-date">
-    <a href="https://drouot.com/en/l/33790690-velde-rinus-van-de-1983-leuven-titre-a-silent-approach-date" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/c2d0d4d03cc0170c7fb1d235ec6b9c0f" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/rinus-van-de-velde" target="_blank" rel="noopener">Rinus Van de Velde</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790690-velde-rinus-van-de-1983-leuven-titre-a-silent-approach-date" target="_blank" rel="noopener">"A Silent Approach"</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€8,000–12,000</div>
-      <div class="card-dims">65 × 55 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Shirley Jaffe"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="1015"
-    data-url="https://drouot.com/en/l/33790888-jaffe-shirley-1923-elizabeth-nj-usa-2016-louveciennes-france">
-    <a href="https://drouot.com/en/l/33790888-jaffe-shirley-1923-elizabeth-nj-usa-2016-louveciennes-france" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/60e5853fd98761c990debdd441f8c4d4" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/shirley-jaffe" target="_blank" rel="noopener">Shirley Jaffe</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790888-jaffe-shirley-1923-elizabeth-nj-usa-2016-louveciennes-france" target="_blank" rel="noopener">Sans titre</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€7,000–9,000</div>
-      <div class="card-dims">35 × 29 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Titus Schade"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="29900"
-    data-url="https://drouot.com/en/l/33790671-dommage-titus-1984-leipzig-titre-le-lac-de-barrage-la-petite">
-    <a href="https://drouot.com/en/l/33790671-dommage-titus-1984-leipzig-titre-le-lac-de-barrage-la-petite" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/7d5b8939c7d2afe984beb798906b6bda" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/titus-schade" target="_blank" rel="noopener">Titus Schade</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790671-dommage-titus-1984-leipzig-titre-le-lac-de-barrage-la-petite" target="_blank" rel="noopener">"Le lac de barrage"/"La petite étagère transversale"</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€12,000–18,000</div>
-      <div class="card-dims">200 × 149.5 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="504"
-    data-url="https://drouot.com/en/l/33790733-sachs-tom-1966-new-york-titre-wind-up-hello-kitty-date-2008">
-    <a href="https://drouot.com/en/l/33790733-sachs-tom-1966-new-york-titre-wind-up-hello-kitty-date-2008" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/638e55503e73bd17a5b7edfbee424631" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790733-sachs-tom-1966-new-york-titre-wind-up-hello-kitty-date-2008" target="_blank" rel="noopener">Wind-Up Hello Kitty</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€7,000–9,000</div>
-      <div class="card-dims">28 × 18 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="169"
-    data-url="https://drouot.com/en/l/33790734-sachs-tom-1966-new-york-titre-big-mac-box-date-2008">
-    <a href="https://drouot.com/en/l/33790734-sachs-tom-1966-new-york-titre-big-mac-box-date-2008" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/fcc2c838f75f900399e919b7771c05b6" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790734-sachs-tom-1966-new-york-titre-big-mac-box-date-2008" target="_blank" rel="noopener">Big Mac Box</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€6,000–8,000</div>
-      <div class="card-dims">12.5 × 13.5 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="120"
-    data-url="https://drouot.com/en/l/33790735-sachs-tom-1966-new-york-titre-leica-date-2003-technique-la">
-    <a href="https://drouot.com/en/l/33790735-sachs-tom-1966-new-york-titre-leica-date-2003-technique-la" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/af61f257d22668fff78fd7c7d42c6901" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790735-sachs-tom-1966-new-york-titre-leica-date-2003-technique-la" target="_blank" rel="noopener">Leica</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      <div class="card-dims">8 × 15 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="225"
-    data-url="https://drouot.com/en/l/33790736-sachs-tom-1966-new-york-titre-sans-titre-skull-date-2005">
-    <a href="https://drouot.com/en/l/33790736-sachs-tom-1966-new-york-titre-sans-titre-skull-date-2005" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/daf7b23af934ab36b6d70d436ed7d40e" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790736-sachs-tom-1966-new-york-titre-sans-titre-skull-date-2005" target="_blank" rel="noopener">Sans titre (Skull)</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€7,000–9,000</div>
-      <div class="card-dims">15 × 15 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="224"
-    data-url="https://drouot.com/en/l/33790737-sachs-tom-1966-new-york-titre-skull-date-1999-technique-cold">
-    <a href="https://drouot.com/en/l/33790737-sachs-tom-1966-new-york-titre-skull-date-1999-technique-cold" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/00a46025e69f5c710476cf851822a4cb" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790737-sachs-tom-1966-new-york-titre-skull-date-1999-technique-cold" target="_blank" rel="noopener">Skull</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€7,000–9,000</div>
-      <div class="card-dims">16 × 14 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="288"
-    data-url="https://drouot.com/en/l/33790731-sachs-tom-1966-new-york-titre-miffy-date-2002-technique">
-    <a href="https://drouot.com/en/l/33790731-sachs-tom-1966-new-york-titre-miffy-date-2002-technique" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/6acaaaf32e1504ce0ef4987b40ce19c5" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790731-sachs-tom-1966-new-york-titre-miffy-date-2002-technique" target="_blank" rel="noopener">Miffy</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€5,000–7,000</div>
-      <div class="card-dims">24 × 12 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Tom Sachs"
-    data-date="2026-06-11T09:00:00+00:00"
-    data-house="Van Ham — Modern | Post War | Contemporary, Daysale"
-    data-price=""
-    data-currency="€"
-    data-area="304"
-    data-url="https://drouot.com/en/l/33790732-sachs-tom-1966-new-york-titre-hello-kitty-date-2001">
-    <a href="https://drouot.com/en/l/33790732-sachs-tom-1966-new-york-titre-hello-kitty-date-2001" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=854/174206/51fa7354c8a35d112b1159ef1fff7b06" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/tom-sachs" target="_blank" rel="noopener">Tom Sachs</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33790732-sachs-tom-1966-new-york-titre-hello-kitty-date-2001" target="_blank" rel="noopener">Hello Kitty</a></div>
-      <div class="card-house">Van Ham — Modern | Post War | Contemporary, Daysale</div>
-      <div class="card-estimate">€7,000–9,000</div>
-      <div class="card-dims">19 × 16 cm</div>
       <div class="card-date">Closes Thu Jun 11, 09:00 UTC</div>
     </div>
   </article>
@@ -6733,30 +6565,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-house">Chiswick Auctions</div>
       <div class="card-estimate">£2,000–3,000</div>
       <div class="card-dims">101 × 152.5 cm</div>
-      <div class="card-date">Closes Thu Jun 11, 10:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Julian Opie"
-    data-date="2026-06-11T10:00:00+00:00"
-    data-house="Chiswick Auctions: Prints & Multiples"
-    data-price=""
-    data-currency="€"
-    data-area=""
-    data-url="https://www.artsy.net/artwork/julian-opie-aniela-statuettes">
-    <a href="https://www.artsy.net/artwork/julian-opie-aniela-statuettes" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://d32dm0rphc51dk.cloudfront.net/r79qZ8OpKEdRd2obF4ZhJQ/large.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/julian-opie" target="_blank" rel="noopener">Julian Opie</a></div>
-      <div class="card-title"><a href="https://www.artsy.net/artwork/julian-opie-aniela-statuettes" target="_blank" rel="noopener">Aniela Statuettes</a></div>
-      <div class="card-house">Chiswick Auctions: Prints & Multiples</div>
-      <div class="card-estimate">£800–1,200</div>
-      
       <div class="card-date">Closes Thu Jun 11, 10:00 UTC</div>
     </div>
   </article>
@@ -7502,30 +7310,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <div class="card-estimate">€20,000–40,000</div>
       
       <div class="card-date">Closes Fri Jun 12, 08:00 UTC</div>
-    </div>
-  </article>
-  <button class="card-like" aria-label="Like">&#9825;</button>
-  </div>
-  
-  <div class="card-wrap">
-  <article class="card"
-    data-artist="Shirley Jaffe"
-    data-date="2026-06-12T12:00:00+00:00"
-    data-house="Drouot Estimations — Art Moderne, d'après-guerre, contemporain & design"
-    data-price=""
-    data-currency="€"
-    data-area="3240"
-    data-url="https://drouot.com/en/l/33796742-attribue-a-shirley-jaffe-1923-2016-sans-titre-gouache-sur">
-    <a href="https://drouot.com/en/l/33796742-attribue-a-shirley-jaffe-1923-2016-sans-titre-gouache-sur" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="https://cdn.drouot.com/d/image/lot?size=fullHD&path=58/179565/2115cd26561134f65e9486712898981b" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
-    </a>
-    <div class="card-body">
-      <div class="card-artist"><a href="https://www.artsy.net/artist/shirley-jaffe" target="_blank" rel="noopener">Shirley Jaffe</a></div>
-      <div class="card-title"><a href="https://drouot.com/en/l/33796742-attribue-a-shirley-jaffe-1923-2016-sans-titre-gouache-sur" target="_blank" rel="noopener">Attribué à Shirley JAFFE (1923-2016) Sans titre. Gouache sur papier. Non signé. 64,8 x 50 cm. Trous de punaises aux angles, pliures, frottements et taches. Provenance : Collection Jean Fournier. Colle</a></div>
-      <div class="card-house">Drouot Estimations — Art Moderne, d'après-guerre, contemporain & design</div>
-      <div class="card-estimate">€3,000–5,000</div>
-      <div class="card-dims">64.8 × 50 cm</div>
-      <div class="card-date">Closes Fri Jun 12, 12:00 UTC</div>
     </div>
   </article>
   <button class="card-like" aria-label="Like">&#9825;</button>
@@ -10666,6 +10450,18 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   var layoutBtn = document.getElementById('layout-btn');
   var wraps = Array.from(grid.querySelectorAll('.card-wrap'));
   var cards = wraps.map(function (w) { return w.querySelector('.card'); });
+
+  // Assign size bucket class to each wrap (used by "By Size" layout)
+  function _szClass(area) {
+    if (!area) return 'sz-s';
+    var a = parseInt(area, 10);
+    if (a < 400)   return 'sz-xs';
+    if (a < 2000)  return 'sz-s';
+    if (a < 6000)  return 'sz-m';
+    if (a < 14000) return 'sz-l';
+    return 'sz-xl';
+  }
+  wraps.forEach(function (w) { w.classList.add(_szClass(w.querySelector('.card').dataset.area)); });
   var activeArtist = '';
   var sortMode = 'date';
   var likedOnly = false;
@@ -10867,15 +10663,21 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     redraw();
   }
 
-  // ── Layout toggle ────────────────────────────────────────────────────────
-  var isLarge = localStorage.getItem('aw-layout') === 'large';
-  if (isLarge) { grid.classList.add('grid-large'); layoutBtn.textContent = 'Compact view'; }
-
+  // ── Layout toggle (compact → large → by size → compact) ─────────────────
+  var _layouts = ['compact', 'large', 'bysize'];
+  var _layoutLabels = {compact: 'Large view', large: 'By Size', bysize: 'Compact view'};
+  var _saved = localStorage.getItem('aw-layout') || 'compact';
+  var layoutMode = _layouts.indexOf(_saved) >= 0 ? _saved : 'compact';
+  function applyLayout() {
+    grid.classList.toggle('grid-large', layoutMode === 'large');
+    grid.classList.toggle('grid-bysize', layoutMode === 'bysize');
+    layoutBtn.textContent = _layoutLabels[layoutMode];
+    localStorage.setItem('aw-layout', layoutMode);
+  }
+  applyLayout();
   layoutBtn.addEventListener('click', function () {
-    isLarge = !isLarge;
-    grid.classList.toggle('grid-large', isLarge);
-    localStorage.setItem('aw-layout', isLarge ? 'large' : 'compact');
-    layoutBtn.textContent = isLarge ? 'Compact view' : 'Large view';
+    layoutMode = _layouts[(_layouts.indexOf(layoutMode) + 1) % _layouts.length];
+    applyLayout();
   });
 
   // ── Artist filter chips ──────────────────────────────────────────────────
