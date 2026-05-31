@@ -213,7 +213,7 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
                 (_norm(lot.artist), lot.close_date.date())
             )
 
-    return [
+    out = [
         lot for lot in out
         if not (
             lot.source == "invaluable"
@@ -221,6 +221,28 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
             and (mapped := _invaluable_direct_source(lot.house)) is not None
             and (_norm(lot.artist), lot.close_date.date())
             in direct_by_source.get(mapped, set())
+        )
+    ]
+
+    # Pass 4: Drouot dedup — some auction houses (e.g. Van Ham) list their lots
+    # on both their own site and the Drouot umbrella platform. Prefer the direct
+    # scraper when we have a matching (artist, date-day) lot.
+    drouot_direct_by_source: dict[str, set[tuple]] = {}
+    for lot in out:
+        mapped = _invaluable_direct_source(lot.house)
+        if lot.source == mapped and lot.close_date is not None:
+            drouot_direct_by_source.setdefault(mapped, set()).add(
+                (_norm(lot.artist), lot.close_date.date())
+            )
+
+    return [
+        lot for lot in out
+        if not (
+            lot.source == "drouot"
+            and lot.close_date is not None
+            and (mapped := _invaluable_direct_source(lot.house)) is not None
+            and (_norm(lot.artist), lot.close_date.date())
+            in drouot_direct_by_source.get(mapped, set())
         )
     ]
 
