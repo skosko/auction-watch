@@ -18,7 +18,8 @@ def _format_estimate(lot: Lot) -> str:
         return "Estimate not published"
     cur = lot.currency or ""
     if lot.estimate_low and lot.estimate_high:
-        return f"{cur}{lot.estimate_low:,}–{lot.estimate_high:,}"
+        lo, hi = sorted([lot.estimate_low, lot.estimate_high])
+        return f"{cur}{lo:,}–{hi:,}"
     val = lot.estimate_low or lot.estimate_high
     return f"{cur}{val:,}"
 
