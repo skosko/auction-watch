@@ -144,12 +144,19 @@ def _extract_from_payload(payload, artist_name: str) -> list[Lot]:
 
 
 async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
-    from ._playwright_utils import camoufox_context, wait_for_content
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        log.warning("dorotheum: playwright not installed, skipping")
+        return []
+
+    from ._playwright_utils import new_browser_context, wait_for_content
 
     all_lots: list[Lot] = []
     sem = asyncio.Semaphore(CONCURRENCY)
 
-    async with camoufox_context() as (browser, context):
+    async with async_playwright() as p:
+        browser, context = await new_browser_context(p)
 
         async def _search_one(artist: Artist) -> list[Lot]:
             async with sem:

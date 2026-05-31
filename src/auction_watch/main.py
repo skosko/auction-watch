@@ -59,10 +59,17 @@ SCRAPERS = [
 ]
 
 
+SCRAPER_TIMEOUT = 300  # seconds; kills any scraper that hangs
+
+
 async def _gather_lots(artists: list[Artist]) -> list[Lot]:
     async with httpx.AsyncClient() as client:
         results = await asyncio.gather(
-            *(s.collect(client, artists) for s in SCRAPERS), return_exceptions=True
+            *(
+                asyncio.wait_for(s.collect(client, artists), timeout=SCRAPER_TIMEOUT)
+                for s in SCRAPERS
+            ),
+            return_exceptions=True,
         )
     out: list[Lot] = []
     for scraper, res in zip(SCRAPERS, results):
