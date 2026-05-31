@@ -25,7 +25,7 @@ name = "drouot"
 
 API_BASE = "https://api.drouot.com/drouot/gingolem"
 LOT_BASE = "https://drouot.com/en/l/"
-IMG_BASE = "https://cdn.drouot.com/d/image/lot?size=small&path="
+IMG_BASE = "https://cdn.drouot.com/d/image/lot?size=large&path="
 
 CONCURRENCY = 10
 CONCURRENCY_SALE = 5

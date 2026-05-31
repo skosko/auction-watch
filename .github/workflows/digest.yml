@@ -28,6 +28,7 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
+          ADD_ARTIST_TOKEN: ${{ secrets.ADD_ARTIST_TOKEN }}
         run: uv run auction-watch
 
       - name: Deploy to GitHub Pages

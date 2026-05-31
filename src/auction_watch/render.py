@@ -49,6 +49,7 @@ def render_digest(
 def render_web(
     lots: list[Lot],
     artist_slugs: dict[str, str] | None = None,
+    github_token: str = "",
 ) -> str:
     template = _env.get_template("web.html.j2")
     sorted_lots = sorted(lots, key=_sort_key)
@@ -61,4 +62,5 @@ def render_web(
         artists=artists,
         generated_at=datetime.now(timezone.utc),
         artist_slugs=artist_slugs or {},
+        github_token=github_token,
     )

@@ -189,6 +189,12 @@ async def _enrich_lot(
     if close_dt is None:
         return None
 
+    # Prefer og:image over the constructed gallery URL (more reliable)
+    og_m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html)
+    if not og_m:
+        og_m = re.search(r'<meta\s+content="([^"]+)"\s+property="og:image"', html)
+    image_url = og_m.group(1) if og_m else raw["image_url"]
+
     # Sale name from page <title>: "Sale Name | ... | Artist-Title | Van Ham ..."
     title_m = re.search(r"<title[^>]*>([^<]+)</title>", html)
     house = "Van Ham"
@@ -205,7 +211,7 @@ async def _enrich_lot(
         house=house,
         close_date=close_dt,
         url=raw["url"],
-        image_url=raw["image_url"],
+        image_url=image_url,
         estimate_low=raw["estimate_low"],
         estimate_high=raw["estimate_high"],
         currency="€",

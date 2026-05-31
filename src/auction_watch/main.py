@@ -149,7 +149,7 @@ def cli():
     out.write_text(html, encoding="utf-8")
     log.info("Wrote %s", out.resolve())
 
-    web = render_web(lots, artist_slugs=artist_slugs)
+    web = render_web(lots, artist_slugs=artist_slugs, github_token=os.environ.get("ADD_ARTIST_TOKEN", ""))
     web_out = Path("_site/index.html")
     web_out.parent.mkdir(exist_ok=True)
     web_out.write_text(web, encoding="utf-8")
