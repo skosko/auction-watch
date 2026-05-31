@@ -23,6 +23,7 @@ from .scrapers import (
     invaluable,
     juliens,
     ketterer,
+    lempertz,
     phillips,
     rago,
     sothebys,
@@ -56,6 +57,7 @@ SCRAPERS = [
     juliens,
     firstdibs,
     vanham,
+    lempertz,
 ]
 
 
@@ -71,6 +73,7 @@ _INVALUABLE_HOUSE_MAP: list[tuple[str, str]] = [
     ("rago", "rago"),
     ("wright", "rago"),    # Wright Auction is on the same Inertia platform
     ("julien", "juliens"),
+    ("lempertz", "lempertz"),
 ]
 
 
