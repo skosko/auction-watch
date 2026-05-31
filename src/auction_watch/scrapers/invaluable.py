@@ -43,24 +43,46 @@ CURRENCY_SYMBOL = {
 
 # Matches "N[.N] x N[.N] [x N[.N]] cm/in" — captures first two dims + unit.
 _DIM_RE = re.compile(
-    r"(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+(?:\.\d+)?)"
-    r"(?:\s*[xX×]\s*[\d.]+)?\s*(cm|in(?:ch(?:es)?)?)\b",
+    r"(\d+(?:[.,]\d+)?)\s*[xX×]\s*(\d+(?:[.,]\d+)?)"
+    r"(?:\s*[xX×]\s*[\d.,]+)?\s*(cm|in(?:ch(?:es)?)?|mm)\b",
+    re.IGNORECASE,
+)
+
+# French H/L labelled format: "H: 19; L: 26 cm" — high confidence due to both labels + unit.
+_DIM_HL_RE = re.compile(
+    r"[Hh](?:auteur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(?:cm|in|mm)?\s*[;,]?\s*"
+    r"[Ll](?:argeur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(cm|in(?:ch(?:es)?)?|mm)\b",
     re.IGNORECASE,
 )
 
 
 def _extract_dimensions(desc: str) -> str | None:
-    """Parse first "W x H (x D) cm/in" pattern from a lot description."""
+    """Parse first dimension pattern from a lot description."""
     m = _DIM_RE.search(desc)
-    if not m:
-        return None
-    try:
-        w, h = float(m.group(1)), float(m.group(2))
-    except ValueError:
-        return None
-    if m.group(3).lower().startswith("in"):
-        w, h = round(w * 2.54, 1), round(h * 2.54, 1)
-    return f"{w:g} × {h:g} cm"
+    if m:
+        try:
+            w, h = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
+        except ValueError:
+            return None
+        unit = m.group(3).lower()
+        if unit == "mm":
+            w, h = round(w / 10, 1), round(h / 10, 1)
+        elif unit.startswith("in"):
+            w, h = round(w * 2.54, 1), round(h * 2.54, 1)
+        return f"{w:g} × {h:g} cm"
+    m = _DIM_HL_RE.search(desc)
+    if m:
+        try:
+            h_val, l_val = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
+        except ValueError:
+            return None
+        unit = m.group(3).lower()
+        if unit == "mm":
+            h_val, l_val = round(h_val / 10, 1), round(l_val / 10, 1)
+        elif unit.startswith("in"):
+            h_val, l_val = round(h_val * 2.54, 1), round(l_val * 2.54, 1)
+        return f"{h_val:g} × {l_val:g} cm"
+    return None
 
 
 def _normalize(s: str) -> str:

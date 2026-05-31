@@ -62,22 +62,40 @@ _DIM_RE = re.compile(
     re.IGNORECASE,
 )
 
+# French H/L labelled format: "H: 19; L: 26 cm" or "Hauteur: 50, Largeur: 70 cm"
+# High-confidence: both labels present + explicit unit.
+_DIM_HL_RE = re.compile(
+    r"[Hh](?:auteur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(?:cm|in|mm)?\s*[;,]?\s*"
+    r"[Ll](?:argeur)?[.:]\s*(\d+(?:[.,]\d+)?)\s*(cm|in(?:ch(?:es)?)?|mm)\b",
+    re.IGNORECASE,
+)
+
+
+def _to_cm(a: float, b: float, unit: str) -> str:
+    u = unit.lower()
+    if u == "mm":
+        a, b = round(a / 10, 1), round(b / 10, 1)
+    elif u.startswith("in"):
+        a, b = round(a * 2.54, 1), round(b * 2.54, 1)
+    return f"{a:g} × {b:g} cm"
+
 
 def _extract_dimensions(text: str) -> str | None:
     m = _DIM_RE.search(text)
-    if not m:
-        return None
-    try:
-        w = float(m.group(1).replace(",", "."))
-        h = float(m.group(2).replace(",", "."))
-    except ValueError:
-        return None
-    unit = m.group(3).lower()
-    if unit == "mm":
-        w, h = round(w / 10, 1), round(h / 10, 1)
-    elif unit.startswith("in"):
-        w, h = round(w * 2.54, 1), round(h * 2.54, 1)
-    return f"{w:g} × {h:g} cm"
+    if m:
+        try:
+            w, h = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
+        except ValueError:
+            return None
+        return _to_cm(w, h, m.group(3))
+    m = _DIM_HL_RE.search(text)
+    if m:
+        try:
+            h_val, l_val = float(m.group(1).replace(",", ".")), float(m.group(2).replace(",", "."))
+        except ValueError:
+            return None
+        return _to_cm(h_val, l_val, m.group(3))
+    return None
 
 
 def _parse_title(description: str) -> str:
