@@ -160,20 +160,32 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
         out.append(lot)
 
     # Pass 2: cross-source dedup — Artsy is an aggregator and often mirrors lots
-    # already found by a direct-house scraper. Drop Artsy lots when the same
-    # (artist, date-day) is covered by another source with a compatible title.
-    # Title matching uses startswith so that edition suffixes ("Too Darn Hot 69"
-    # vs "Too Darn Hot") and minor formatting differences don't cause misses.
+    # already found by a direct-house scraper.
+    #
+    # For Drouot: title matching is unreliable because our Drouot scraper stores
+    # the raw lot description (e.g. "CHAPMAN JAKE AND DINOS Chess set, 2003 ...")
+    # rather than a clean title. Drop any Artsy lot when a Drouot lot exists for
+    # the same (artist, date-day) without requiring a title match.
+    #
+    # For all other direct sources: use prefix-aware title matching so edition
+    # suffixes ("Too Darn Hot 69" vs "Too Darn Hot") don't cause misses.
+    drouot_artist_dates: set[tuple] = set()
     direct_by_artist_date: dict[tuple, set[str]] = {}
     for lot in out:
-        if lot.source != "artsy" and lot.close_date is not None:
-            key = (_norm(lot.artist), lot.close_date.date())
+        if lot.source == "artsy" or lot.close_date is None:
+            continue
+        key = (_norm(lot.artist), lot.close_date.date())
+        if lot.source == "drouot":
+            drouot_artist_dates.add(key)
+        else:
             direct_by_artist_date.setdefault(key, set()).add(_norm(lot.title))
 
     def _artsy_is_dup(lot: Lot) -> bool:
         if lot.source != "artsy" or lot.close_date is None:
             return False
         key = (_norm(lot.artist), lot.close_date.date())
+        if key in drouot_artist_dates:
+            return True
         candidates = direct_by_artist_date.get(key)
         if not candidates:
             return False
