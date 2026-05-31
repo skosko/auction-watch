@@ -4,7 +4,7 @@ Tracks upcoming auction lots and dealer listings for a list of artists. Sends a 
 
 ## What it does
 
-- Scrapes 13 auction houses and platforms (Sotheby's, Christie's, Phillips, Bonhams, Invaluable, Drouot, Julien's, Rago/Wright, Ketterer, Van Ham, Artsy, and more)
+- Scrapes 14 auction houses and platforms (Sotheby's, Christie's, Phillips, Bonhams, Invaluable, Drouot, Julien's, Rago/Wright, Ketterer, Lempertz, Van Ham, Artsy, and more)
 - Deduplicates across sources — direct house scrapers take priority over Artsy mirrors
 - Sends a responsive HTML email via [Resend](https://resend.com)
 - Publishes all current lots to a filterable website on GitHub Pages
@@ -13,7 +13,7 @@ Tracks upcoming auction lots and dealer listings for a list of artists. Sends a 
 
 `https://<your-github-username>.github.io/auction-watch/`
 
-Rebuilt daily. Filter by artist, sort by date or house. No login required.
+Rebuilt daily. Filter by artist, sort by date or house. Like individual lots (saved in your browser). No login required.
 
 **One-time setup:** Repo Settings → Pages → Source: `gh-pages` branch, `/ (root)`.
 
@@ -111,6 +111,7 @@ uv run auction-watch
 | Drouot | neoGingo REST API |
 | Julien's | Supabase PostgREST |
 | Ketterer | HTML scrape |
+| Lempertz | HTML scrape (artist-index pages) |
 | Van Ham | HTML scrape |
 | Dorotheum | Stub (Cloudflare blocks) |
 | 1stDibs | Stub (buy-now marketplace) |

@@ -63,10 +63,27 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-like:hover{transform:scale(1.2)}
 .card-wrap{position:relative}
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
+/* By Size layout */
+#grid.grid-bysize{grid-template-columns:repeat(6,1fr)}
+#grid.grid-bysize .card-wrap{grid-column:span 2}
+#grid.grid-bysize .card-wrap.sz-xs{grid-column:span 1}
+#grid.grid-bysize .card-wrap.sz-s{grid-column:span 2}
+#grid.grid-bysize .card-wrap.sz-m{grid-column:span 3}
+#grid.grid-bysize .card-wrap.sz-l{grid-column:span 4}
+#grid.grid-bysize .card-wrap.sz-xl{grid-column:span 6}
+#grid.grid-bysize .card-img-link{aspect-ratio:1}
+#grid.grid-bysize .card-img-ph{aspect-ratio:1}
+@media(max-width:900px){
+  #grid.grid-bysize{grid-template-columns:repeat(4,1fr)}
+  #grid.grid-bysize .card-wrap.sz-l{grid-column:span 3}
+  #grid.grid-bysize .card-wrap.sz-xl{grid-column:span 4}
+}
 @media(max-width:600px){
   #bar,#price-bar,#add-bar{padding:10px 14px}
   #grid{padding:14px;gap:10px}
   #add-input{width:180px}
+  #grid.grid-bysize{grid-template-columns:repeat(2,1fr)}
+  #grid.grid-bysize .card-wrap{grid-column:span 1!important}
 }
 </style>
 </head>
@@ -171,6 +188,18 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   var layoutBtn = document.getElementById('layout-btn');
   var wraps = Array.from(grid.querySelectorAll('.card-wrap'));
   var cards = wraps.map(function (w) { return w.querySelector('.card'); });
+
+  // Assign size bucket class to each wrap (used by "By Size" layout)
+  function _szClass(area) {
+    if (!area) return 'sz-s';
+    var a = parseInt(area, 10);
+    if (a < 400)   return 'sz-xs';
+    if (a < 2000)  return 'sz-s';
+    if (a < 6000)  return 'sz-m';
+    if (a < 14000) return 'sz-l';
+    return 'sz-xl';
+  }
+  wraps.forEach(function (w) { w.classList.add(_szClass(w.querySelector('.card').dataset.area)); });
   var activeArtist = '';
   var sortMode = 'date';
   var likedOnly = false;
@@ -372,15 +401,21 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     redraw();
   }
 
-  // ── Layout toggle ────────────────────────────────────────────────────────
-  var isLarge = localStorage.getItem('aw-layout') === 'large';
-  if (isLarge) { grid.classList.add('grid-large'); layoutBtn.textContent = 'Compact view'; }
-
+  // ── Layout toggle (compact → large → by size → compact) ─────────────────
+  var _layouts = ['compact', 'large', 'bysize'];
+  var _layoutLabels = {compact: 'Large view', large: 'By Size', bysize: 'Compact view'};
+  var _saved = localStorage.getItem('aw-layout') || 'compact';
+  var layoutMode = _layouts.indexOf(_saved) >= 0 ? _saved : 'compact';
+  function applyLayout() {
+    grid.classList.toggle('grid-large', layoutMode === 'large');
+    grid.classList.toggle('grid-bysize', layoutMode === 'bysize');
+    layoutBtn.textContent = _layoutLabels[layoutMode];
+    localStorage.setItem('aw-layout', layoutMode);
+  }
+  applyLayout();
   layoutBtn.addEventListener('click', function () {
-    isLarge = !isLarge;
-    grid.classList.toggle('grid-large', isLarge);
-    localStorage.setItem('aw-layout', isLarge ? 'large' : 'compact');
-    layoutBtn.textContent = isLarge ? 'Compact view' : 'Large view';
+    layoutMode = _layouts[(_layouts.indexOf(layoutMode) + 1) % _layouts.length];
+    applyLayout();
   });
 
   // ── Artist filter chips ──────────────────────────────────────────────────
