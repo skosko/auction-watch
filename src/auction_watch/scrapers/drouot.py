@@ -25,7 +25,7 @@ name = "drouot"
 
 API_BASE = "https://api.drouot.com/drouot/gingolem"
 LOT_BASE = "https://drouot.com/en/l/"
-IMG_BASE = "https://cdn.drouot.com/d/image/lot?size=large&path="
+IMG_BASE = "https://cdn.drouot.com/d/image/lot?size=fullHD&path="
 
 CONCURRENCY = 10
 CONCURRENCY_SALE = 5
@@ -53,6 +53,21 @@ def _normalize(s: str) -> str:
     nfkd = unicodedata.normalize("NFKD", s)
     stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
     return re.sub(r"\s+", " ", stripped).strip().lower()
+
+
+def _desc_matches_artist(artist_norm: str, desc_norm: str) -> bool:
+    """True iff desc_norm plausibly refers to the queried artist.
+
+    Drouot descriptions start with "LASTNAME Firstname". For single-word
+    artist names (e.g. "parra"), require the word to appear at a word
+    boundary at the start of the description, not just anywhere.
+    """
+    if artist_norm not in desc_norm:
+        return False
+    if " " not in artist_norm:
+        first = re.split(r"\W+", desc_norm)[0]
+        return first == artist_norm
+    return True
 
 
 async def _get_sale_house(client: httpx.AsyncClient, sale_id: int) -> str:
@@ -109,7 +124,7 @@ async def _search_artist(
 
         # Artist name verification: description usually starts with "LASTNAME FIRSTNAME"
         desc_norm = _normalize(hit.get("description") or "")
-        if artist_norm not in desc_norm:
+        if not _desc_matches_artist(artist_norm, desc_norm):
             continue
 
         ts = hit.get("date") or hit.get("bidEndDate")

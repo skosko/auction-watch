@@ -69,6 +69,26 @@ def _normalize(s: str) -> str:
     return re.sub(r"\s+", " ", stripped).strip().lower()
 
 
+def _artist_matches(artist_norm: str, hit_artist: str) -> bool:
+    """True iff hit_artist meaningfully refers to artist_norm.
+
+    For multi-word queries the existing substring logic suffices.
+    For single-word queries (e.g. "parra") we additionally require the
+    query word to be the FIRST word of the hit artist, so that surname-only
+    spurious matches like "Oscar Dominguez Parra" are rejected.
+    """
+    if not hit_artist:
+        return False
+    if artist_norm == hit_artist:
+        return True
+    if artist_norm in hit_artist:
+        if " " not in artist_norm:
+            first = re.split(r"\W+", hit_artist)[0]
+            return first == artist_norm
+        return True
+    return hit_artist in artist_norm
+
+
 def _lot_url(hit: dict) -> str:
     """Build the correct invaluable.com lot URL from Algolia hit fields.
 
@@ -102,6 +122,13 @@ def _hit_to_lot(hit: dict, artist_name: str) -> Lot | None:
 
     house = hit.get("houseName") or "Invaluable"
     title = hit.get("lotTitle") or "Untitled"
+    # Invaluable often prefixes the title with the artist name ("Artist: Title"
+    # or "Artist, Title"). Strip it so deduplication and display work better.
+    for _sep in (": ", ", "):
+        _pfx = artist_name + _sep
+        if title.lower().startswith(_pfx.lower()):
+            title = title[len(_pfx):].strip() or title
+            break
 
     currency_code = (hit.get("currencyCode") or "").upper()
     currency = CURRENCY_SYMBOL.get(currency_code, currency_code) or None
@@ -163,9 +190,7 @@ async def _search_artist(client: httpx.AsyncClient, artist: Artist) -> list[Lot]
         hit_artist = _normalize(hit.get("artistName") or "")
         # Require a non-empty artist name and substantial overlap in both directions.
         # Empty hit_artist must be rejected — "" is a substring of everything.
-        if not hit_artist:
-            continue
-        if artist_norm not in hit_artist and hit_artist not in artist_norm:
+        if not _artist_matches(artist_norm, hit_artist):
             continue
         lot = _hit_to_lot(hit, artist.name)
         if lot:

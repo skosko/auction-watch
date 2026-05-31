@@ -68,6 +68,9 @@ _INVALUABLE_HOUSE_MAP: list[tuple[str, str]] = [
     ("bonham", "bonhams"),
     ("drouot", "drouot"),
     ("phillips", "phillips"),
+    ("rago", "rago"),
+    ("wright", "rago"),    # Wright Auction is on the same Inertia platform
+    ("julien", "juliens"),
 ]
 
 
@@ -158,20 +161,30 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
 
     # Pass 2: cross-source dedup — Artsy is an aggregator and often mirrors lots
     # already found by a direct-house scraper. Drop Artsy lots when the same
-    # (artist, title_prefix, close_date_day) is covered by another source.
-    direct_keys: set[tuple] = set()
+    # (artist, date-day) is covered by another source with a compatible title.
+    # Title matching uses startswith so that edition suffixes ("Too Darn Hot 69"
+    # vs "Too Darn Hot") and minor formatting differences don't cause misses.
+    direct_by_artist_date: dict[tuple, set[str]] = {}
     for lot in out:
         if lot.source != "artsy" and lot.close_date is not None:
-            direct_keys.add((_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()))
+            key = (_norm(lot.artist), lot.close_date.date())
+            direct_by_artist_date.setdefault(key, set()).add(_norm(lot.title))
 
-    out = [
-        lot for lot in out
-        if not (
-            lot.source == "artsy"
-            and lot.close_date is not None
-            and (_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()) in direct_keys
-        )
-    ]
+    def _artsy_is_dup(lot: Lot) -> bool:
+        if lot.source != "artsy" or lot.close_date is None:
+            return False
+        key = (_norm(lot.artist), lot.close_date.date())
+        candidates = direct_by_artist_date.get(key)
+        if not candidates:
+            return False
+        a = _norm(lot.title)
+        for d in candidates:
+            short, long_ = (a, d) if len(a) <= len(d) else (d, a)
+            if len(short) >= 8 and long_.startswith(short):
+                return True
+        return False
+
+    out = [lot for lot in out if not _artsy_is_dup(lot)]
 
     # Pass 3: Invaluable dedup — Invaluable aggregates houses we also scrape directly
     # (Van Ham, Bonhams, …). When a direct-source lot exists for the same
