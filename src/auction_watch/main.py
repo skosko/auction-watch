@@ -235,7 +235,7 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
                 (_norm(lot.artist), lot.close_date.date())
             )
 
-    return [
+    out = [
         lot for lot in out
         if not (
             lot.source == "drouot"
@@ -243,6 +243,25 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
             and (mapped := _invaluable_direct_source(lot.house)) is not None
             and (_norm(lot.artist), lot.close_date.date())
             in drouot_direct_by_source.get(mapped, set())
+        )
+    ]
+
+    # Pass 5: Invaluable vs Drouot dedup — Invaluable aggregates Drouot lots
+    # but lists them under the specific auctioneer name (e.g. "De Baecque &
+    # Associés") rather than "Drouot", so Pass 3's house-name matching misses
+    # them. Prefer Drouot because it reliably provides images.
+    drouot_artist_dates: set[tuple] = {
+        (_norm(lot.artist), lot.close_date.date())
+        for lot in out
+        if lot.source == "drouot" and lot.close_date is not None
+    }
+
+    return [
+        lot for lot in out
+        if not (
+            lot.source == "invaluable"
+            and lot.close_date is not None
+            and (_norm(lot.artist), lot.close_date.date()) in drouot_artist_dates
         )
     ]
 

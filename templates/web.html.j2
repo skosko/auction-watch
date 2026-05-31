@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Auction Watch</title>
 <style>
+/* ─ reset / base ─────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#f4f4f2;color:#1a1a1a}
 header{background:#fff;border-bottom:1px solid #eaeaea;padding:20px 24px}
-h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
+h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
 .meta{font-size:13px;color:#777;margin:4px 0 0}
-/* filter bar */
+
+/* ─ filter bar ───────────────────────────────────────────────────────── */
 #bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 24px;background:#fafafa;border-bottom:1px solid #eaeaea}
 .chip{padding:4px 12px;border-radius:100px;border:1px solid #d0d0d0;background:#fff;font-size:12px;cursor:pointer;white-space:nowrap;color:#1a1a1a;transition:background .12s,color .12s,border-color .12s}
 .chip:hover{background:#f0f0f0}
@@ -19,7 +21,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .bar-ctrl:hover{background:#f0f0f0}
 #sort-sel{appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 #bar-right{margin-left:auto;display:flex;gap:6px;align-items:center}
-/* price filter */
+
+/* ─ price filter ─────────────────────────────────────────────────────── */
 #price-bar{display:none;padding:10px 24px 14px;background:#fafafa;border-bottom:1px solid #eaeaea}
 .pf-head{font-size:12px;color:#555;margin-bottom:8px}
 #pf-hist{display:block;width:100%;height:40px}
@@ -30,19 +33,21 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 #pf-sliders input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:all;width:16px;height:16px;border-radius:50%;background:#1a1a1a;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:grab}
 #pf-sliders input::-moz-range-thumb{pointer-events:all;width:14px;height:14px;border-radius:50%;background:#1a1a1a;border:2px solid #fff;cursor:grab;-moz-appearance:none}
 #pf-sliders input::-webkit-slider-runnable-track{height:4px;background:transparent}
-/* add-artist bar */
+
+/* ─ add-artist bar ───────────────────────────────────────────────────── */
 #add-bar{display:none;padding:8px 24px 10px;background:#fafafa;border-bottom:1px solid #eaeaea;align-items:center;gap:10px}
 #add-input{border:1px solid #d0d0d0;border-radius:100px;padding:4px 14px;font-size:13px;width:260px;outline:none}
 #add-input:focus{border-color:#1a1a1a}
 #add-btn{padding:4px 14px;border-radius:100px;border:1px solid #1a1a1a;background:#1a1a1a;color:#fff;font-size:12px;cursor:pointer}
 #add-btn:hover{background:#333}
 #add-msg{font-size:12px;color:#555}
-/* grid */
+
+/* ─ grid / cards ─────────────────────────────────────────────────────── */
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:20px 24px;max-width:1600px;margin:0 auto}
 #grid.grid-large{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
 .card{background:#fff;border-radius:8px;border:1px solid #eaeaea;overflow:hidden;display:flex;flex-direction:column;height:100%}
 .card-wrap[hidden]{display:none!important}
-.card-img-link{display:block;aspect-ratio:4/3;background:#f0f0f0;overflow:hidden}
+.card-img-link{display:block;aspect-ratio:4/3;background:#f0f0f0;overflow:hidden;cursor:zoom-in}
 .grid-large .card-img-link{aspect-ratio:3/2}
 .card-img{width:100%;height:100%;object-fit:contain;display:block}
 .card-img-ph{aspect-ratio:4/3;background:#f0f0f0}
@@ -62,28 +67,127 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-like{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;padding:0;transition:transform .1s;z-index:1}
 .card-like:hover{transform:scale(1.2)}
 .card-wrap{position:relative}
+
+/* ─ masonry layouts ──────────────────────────────────────────────────── */
+/* Switch from grid to CSS columns; each wrap must not be split across cols */
+#grid.grid-masonry-1,#grid.grid-masonry-2,#grid.grid-masonry-3{display:block;gap:0;max-width:1600px}
+#grid.grid-masonry-1 .card-wrap,#grid.grid-masonry-2 .card-wrap,#grid.grid-masonry-3 .card-wrap{break-inside:avoid;display:block;margin-bottom:14px}
+/* natural image height so cards vary in height — the Pinterest effect */
+#grid.grid-masonry-1 .card-img-link,#grid.grid-masonry-2 .card-img-link,#grid.grid-masonry-3 .card-img-link{aspect-ratio:unset;height:auto}
+#grid.grid-masonry-1 .card-img,#grid.grid-masonry-2 .card-img,#grid.grid-masonry-3 .card-img{height:auto;object-fit:fill}
+/* v1 Mosaic — 3 cols, standard density */
+#grid.grid-masonry-1{columns:3 280px;column-gap:14px;padding:20px 24px}
+/* v2 Wide — 2 cols, generous spacing */
+#grid.grid-masonry-2{columns:2 480px;column-gap:24px;padding:24px 32px}
+#grid.grid-masonry-2 .card{border-radius:12px}
+#grid.grid-masonry-2 .card-body{padding:16px 18px 18px}
+#grid.grid-masonry-2 .card-title{font-size:15px}
+/* v3 Dense — 4 cols, minimal metadata */
+#grid.grid-masonry-3{columns:4 200px;column-gap:10px;padding:14px 20px}
+#grid.grid-masonry-3 .card-wrap{margin-bottom:10px}
+#grid.grid-masonry-3 .card-body{padding:7px 9px 9px;gap:1px}
+#grid.grid-masonry-3 .card-title{font-size:12px;margin:1px 0 2px}
+#grid.grid-masonry-3 .card-house,#grid.grid-masonry-3 .card-dims,#grid.grid-masonry-3 .card-eur{display:none}
+#grid.grid-masonry-3 .card-estimate{font-size:11px}
+
+/* ─ fullscreen overlay ───────────────────────────────────────────────── */
+#fs-overlay{position:fixed;inset:0;z-index:200}
+#fs-overlay[hidden]{display:none}
+#fs-content{display:flex;height:100%}
+
+/* shared controls (fixed-position, adapt per variant) */
+#fs-nav{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:8px 22px;border-radius:100px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
+#fs-prev,#fs-next{background:none;border:none;font-size:28px;cursor:pointer;line-height:1;padding:0 2px;opacity:.75;transition:opacity .1s}
+#fs-prev:hover,#fs-next:hover{opacity:1}
+#fs-count{font-size:12px;opacity:.6;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+#fs-close,#fs-style-btn{position:fixed;top:20px;border:none;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10}
+#fs-close{right:24px;width:36px;height:36px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center}
+#fs-style-btn{left:24px;border-radius:100px;padding:7px 16px;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+
+/* ── V1: Gallery — light editorial split ───────────────────────────── */
+#fs-overlay.fs-v1{background:#fff}
+#fs-overlay.fs-v1 #fs-content{flex-direction:row}
+#fs-overlay.fs-v1 #fs-img-pane{flex:3;background:#f4f4f2;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#fs-overlay.fs-v1 #fs-img{max-height:90vh;max-width:100%;object-fit:contain}
+#fs-overlay.fs-v1 #fs-meta-pane{flex:2;max-width:420px;border-left:1px solid #eaeaea;padding:0 52px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
+#fs-overlay.fs-v1 #fs-artist{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.1em}
+#fs-overlay.fs-v1 #fs-title{font-size:26px;font-weight:600;line-height:1.2;margin:14px 0 0;color:#1a1a1a}
+#fs-overlay.fs-v1 #fs-divider{border:none;border-top:1px solid #eaeaea;margin:28px 0}
+#fs-overlay.fs-v1 #fs-sub{display:flex;flex-direction:column;gap:4px;font-size:14px;color:#444}
+#fs-overlay.fs-v1 #fs-dims{font-size:12px;color:#aaa}
+#fs-overlay.fs-v1 #fs-date{font-size:13px;color:#d4541a;margin-top:20px;font-weight:500}
+#fs-overlay.fs-v1 #fs-link{display:inline-block;margin-top:16px;font-size:13px;color:#1a1a1a;text-decoration:none;border-bottom:1px solid #1a1a1a;padding-bottom:1px}
+#fs-overlay.fs-v1 #fs-nav{background:rgba(26,26,26,.08);color:#1a1a1a}
+#fs-overlay.fs-v1 #fs-prev,#fs-overlay.fs-v1 #fs-next{color:#1a1a1a}
+#fs-overlay.fs-v1 #fs-close{background:rgba(0,0,0,.07);color:#555}
+#fs-overlay.fs-v1 #fs-style-btn{background:rgba(0,0,0,.07);color:#777}
+
+/* ── V2: Museum — white stacked ────────────────────────────────────── */
+#fs-overlay.fs-v2{background:#fafaf8}
+#fs-overlay.fs-v2 #fs-content{flex-direction:column;align-items:center;justify-content:center;padding:52px 40px 100px;overflow-y:auto}
+#fs-overlay.fs-v2 #fs-img-pane{flex:none;display:flex;align-items:center;justify-content:center}
+#fs-overlay.fs-v2 #fs-img{max-height:50vh;max-width:72vw;object-fit:contain;display:block}
+#fs-overlay.fs-v2 #fs-meta-pane{max-width:700px;width:100%;flex:none}
+#fs-overlay.fs-v2 #fs-artist{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.1em;margin-top:28px}
+#fs-overlay.fs-v2 #fs-title{font-size:22px;font-style:italic;color:#1a1a1a;margin-top:6px;line-height:1.35}
+#fs-overlay.fs-v2 #fs-divider{border:none;border-top:1px solid #d8d4ce;margin:18px 0}
+#fs-overlay.fs-v2 #fs-sub{display:flex;gap:20px;font-size:13px;color:#666;flex-wrap:wrap;align-items:baseline}
+#fs-overlay.fs-v2 #fs-dims{font-size:12px;color:#bbb}
+#fs-overlay.fs-v2 #fs-date{font-size:12px;color:#d4541a;margin-top:10px}
+#fs-overlay.fs-v2 #fs-link{display:inline-block;margin-top:8px;font-size:12px;color:#bbb;text-decoration:none}
+#fs-overlay.fs-v2 #fs-link:hover{color:#1a1a1a}
+#fs-overlay.fs-v2 #fs-nav{background:rgba(0,0,0,.07);color:#555}
+#fs-overlay.fs-v2 #fs-prev,#fs-overlay.fs-v2 #fs-next{color:#555}
+#fs-overlay.fs-v2 #fs-close{background:rgba(0,0,0,.07);color:#666}
+#fs-overlay.fs-v2 #fs-style-btn{background:rgba(0,0,0,.07);color:#888}
+
+/* ── V3: Editorial — dark full-bleed ───────────────────────────────── */
+#fs-overlay.fs-v3{background:#0d0d0d}
+#fs-overlay.fs-v3 #fs-content{position:relative;flex-direction:column}
+#fs-overlay.fs-v3 #fs-img-pane{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#fs-overlay.fs-v3 #fs-img{max-height:100%;max-width:100%;object-fit:contain;opacity:.9}
+#fs-overlay.fs-v3 #fs-meta-pane{position:relative;z-index:1;margin-top:auto;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.55) 50%,transparent 100%);padding:80px 56px 112px;color:#fff}
+#fs-overlay.fs-v3 #fs-artist{font-size:11px;color:rgba(255,255,255,.42);text-transform:uppercase;letter-spacing:.14em}
+#fs-overlay.fs-v3 #fs-title{font-size:36px;font-weight:700;line-height:1.1;margin:10px 0 0;letter-spacing:-.02em}
+#fs-overlay.fs-v3 #fs-divider{display:none}
+#fs-overlay.fs-v3 #fs-sub{display:flex;gap:20px;margin-top:14px;font-size:13px;color:rgba(255,255,255,.48);flex-wrap:wrap;align-items:baseline}
+#fs-overlay.fs-v3 #fs-dims{font-size:12px;color:rgba(255,255,255,.32)}
+#fs-overlay.fs-v3 #fs-date{font-size:12px;color:rgba(212,84,26,.9);margin-top:8px}
+#fs-overlay.fs-v3 #fs-link{display:inline-block;margin-top:16px;font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.04em}
+#fs-overlay.fs-v3 #fs-link:hover{color:#fff}
+#fs-overlay.fs-v3 #fs-nav{background:rgba(255,255,255,.13);color:#fff}
+#fs-overlay.fs-v3 #fs-prev,#fs-overlay.fs-v3 #fs-next{color:#fff}
+#fs-overlay.fs-v3 #fs-close{background:rgba(255,255,255,.13);color:#fff}
+#fs-overlay.fs-v3 #fs-style-btn{background:rgba(255,255,255,.13);color:rgba(255,255,255,.72)}
+
+/* ─ back to top ──────────────────────────────────────────────────────── */
+#back-top{position:fixed;bottom:32px;right:22px;width:38px;height:38px;border-radius:50%;background:#1a1a1a;color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.22)}
+#back-top.visible{opacity:1;pointer-events:auto}
+
+/* ─ misc ─────────────────────────────────────────────────────────────── */
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
-/* By Size layout */
-#grid.grid-bysize{grid-template-columns:repeat(6,1fr)}
-#grid.grid-bysize .card-wrap{grid-column:span 2}
-#grid.grid-bysize .card-wrap.sz-xs{grid-column:span 1}
-#grid.grid-bysize .card-wrap.sz-s{grid-column:span 2}
-#grid.grid-bysize .card-wrap.sz-m{grid-column:span 3}
-#grid.grid-bysize .card-wrap.sz-l{grid-column:span 4}
-#grid.grid-bysize .card-wrap.sz-xl{grid-column:span 6}
-#grid.grid-bysize .card-img-link{aspect-ratio:1}
-#grid.grid-bysize .card-img-ph{aspect-ratio:1}
+
+/* ─ responsive ───────────────────────────────────────────────────────── */
 @media(max-width:900px){
-  #grid.grid-bysize{grid-template-columns:repeat(4,1fr)}
-  #grid.grid-bysize .card-wrap.sz-l{grid-column:span 3}
-  #grid.grid-bysize .card-wrap.sz-xl{grid-column:span 4}
+  #grid.grid-masonry-1{columns:2 240px}
+  #grid.grid-masonry-3{columns:2 200px}
+  #fs-overlay.fs-v1 #fs-content{flex-direction:column}
+  #fs-overlay.fs-v1 #fs-img-pane{flex:none;max-height:50vh}
+  #fs-overlay.fs-v1 #fs-meta-pane{max-width:100%;border-left:none;border-top:1px solid #eaeaea;padding:28px 32px 100px;flex:1;overflow-y:auto;justify-content:flex-start}
+  #fs-overlay.fs-v1 #fs-title{font-size:20px}
+  #fs-overlay.fs-v3 #fs-title{font-size:26px}
+  #fs-overlay.fs-v3 #fs-meta-pane{padding:60px 36px 112px}
 }
 @media(max-width:600px){
   #bar,#price-bar,#add-bar{padding:10px 14px}
   #grid{padding:14px;gap:10px}
   #add-input{width:180px}
-  #grid.grid-bysize{grid-template-columns:repeat(2,1fr)}
-  #grid.grid-bysize .card-wrap{grid-column:span 1!important}
+  #grid.grid-masonry-1,#grid.grid-masonry-2,#grid.grid-masonry-3{columns:1!important;padding:14px}
+  #fs-overlay.fs-v1 #fs-title,#fs-overlay.fs-v2 #fs-title{font-size:18px}
+  #fs-overlay.fs-v2 #fs-content{padding:32px 20px 100px}
+  #fs-overlay.fs-v3 #fs-title{font-size:20px}
+  #fs-overlay.fs-v3 #fs-meta-pane{padding:50px 24px 112px}
+  #back-top{bottom:80px}
 }
 </style>
 </head>
@@ -107,6 +211,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 <div id="bar">
   <button class="chip active" data-artist="">All artists</button>
   <button class="chip" id="liked-chip" data-liked="0">&#9825; Liked</button>
+  <button class="chip" id="img-chip">Has image</button>
   {% for artist in artists -%}
   <button class="chip" data-artist="{{ artist }}">{{ artist }}</button>
   {% endfor %}
@@ -118,7 +223,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       <option value="price-desc">Sort: Price ↓</option>
       <option value="size-desc">Sort: Size ↓</option>
     </select>
-    <button id="layout-btn" class="bar-ctrl">Large view</button>
+    <button id="layout-btn" class="bar-ctrl">Large</button>
+    <button id="fs-btn" class="bar-ctrl">Fullscreen</button>
   </div>
 </div>
 
@@ -148,7 +254,9 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     data-price="{{ lot.estimate_eur if lot.estimate_eur is not none else '' }}"
     data-currency="€"
     data-area="{{ lot.area_cm2 if lot.area_cm2 is not none else '' }}"
-    data-url="{{ lot.url }}">
+    data-url="{{ lot.url }}"
+    data-estimate-text="{{ lot | estimate }}"
+    data-has-image="{{ '1' if lot.image_url else '' }}">
     {% if lot.image_url -%}
     <a href="{{ lot.url }}" target="_blank" rel="noopener" class="card-img-link">
       <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
@@ -180,6 +288,37 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   Generated by auction-watch &middot; Updated daily
 </footer>
 
+<!-- Fullscreen slideshow overlay -->
+<div id="fs-overlay" hidden>
+  <div id="fs-content">
+    <div id="fs-img-pane">
+      <img id="fs-img" src="" alt="">
+    </div>
+    <div id="fs-meta-pane">
+      <div id="fs-artist"></div>
+      <div id="fs-title"></div>
+      <hr id="fs-divider">
+      <div id="fs-sub">
+        <span id="fs-house"></span>
+        <span id="fs-estimate"></span>
+        <span id="fs-dims"></span>
+      </div>
+      <div id="fs-date"></div>
+      <a id="fs-link" target="_blank" rel="noopener">View lot →</a>
+    </div>
+  </div>
+  <nav id="fs-nav">
+    <button id="fs-prev">&#8249;</button>
+    <span id="fs-count"></span>
+    <button id="fs-next">&#8250;</button>
+  </nav>
+  <button id="fs-style-btn"></button>
+  <button id="fs-close">&#x2715;</button>
+</div>
+
+<!-- Back to top -->
+<button id="back-top" aria-label="Back to top">↑</button>
+
 <script>
 (function () {
   var grid = document.getElementById('grid');
@@ -188,21 +327,10 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
   var layoutBtn = document.getElementById('layout-btn');
   var wraps = Array.from(grid.querySelectorAll('.card-wrap'));
   var cards = wraps.map(function (w) { return w.querySelector('.card'); });
-
-  // Assign size bucket class to each wrap (used by "By Size" layout)
-  function _szClass(area) {
-    if (!area) return 'sz-s';
-    var a = parseInt(area, 10);
-    if (a < 400)   return 'sz-xs';
-    if (a < 2000)  return 'sz-s';
-    if (a < 6000)  return 'sz-m';
-    if (a < 14000) return 'sz-l';
-    return 'sz-xl';
-  }
-  wraps.forEach(function (w) { w.classList.add(_szClass(w.querySelector('.card').dataset.area)); });
   var activeArtist = '';
   var sortMode = 'date';
   var likedOnly = false;
+  var imgOnly = false;
   var currentPriceMin = -Infinity, currentPriceMax = Infinity, priceFilterActive = false;
 
   // ── Likes ────────────────────────────────────────────────────────────────
@@ -214,7 +342,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     try { localStorage.setItem(LIKE_KEY, JSON.stringify(likes)); } catch (e) {}
   }
   function isLiked(url) { return !!getLikes()[url]; }
-
   function updateLikeBtn(btn, url) {
     btn.innerHTML = isLiked(url) ? '&#9829;' : '&#9825;';
     btn.style.color = isLiked(url) ? '#e0345a' : '#888';
@@ -237,7 +364,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
   var likedChip = document.getElementById('liked-chip');
   likedChip.addEventListener('click', function (e) {
-    e.stopPropagation(); // don't trigger artist chip handler
+    e.stopPropagation();
     likedOnly = !likedOnly;
     likedChip.dataset.liked = likedOnly ? '1' : '0';
     likedChip.classList.toggle('active', likedOnly);
@@ -245,27 +372,35 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     applyFilter();
   });
 
-  // ── Filter ──────────────────────────────────────────────────────────────
+  var imgChip = document.getElementById('img-chip');
+  imgChip.addEventListener('click', function () {
+    imgOnly = !imgOnly;
+    imgChip.classList.toggle('active', imgOnly);
+    applyFilter();
+  });
+
+  // ── Filter ───────────────────────────────────────────────────────────────
   function applyFilter() {
     var likes = getLikes();
     var visible = 0;
     wraps.forEach(function (w) {
       var c = w.querySelector('.card');
-      var artistOk = !activeArtist || c.dataset.artist === activeArtist;
-      var likeOk = !likedOnly || !!likes[c.dataset.url];
-      var priceOk = true;
+      var artistOk  = !activeArtist || c.dataset.artist === activeArtist;
+      var likeOk    = !likedOnly    || !!likes[c.dataset.url];
+      var imageOk   = !imgOnly      || c.dataset.hasImage === '1';
+      var priceOk   = true;
       if (priceFilterActive && c.dataset.price !== '') {
         var p = parseInt(c.dataset.price, 10);
         priceOk = p >= currentPriceMin && p <= currentPriceMax;
       }
-      var show = artistOk && likeOk && priceOk;
+      var show = artistOk && likeOk && imageOk && priceOk;
       w.hidden = !show;
       if (show) visible++;
     });
     empty.style.display = visible ? 'none' : 'block';
   }
 
-  // ── Sort ────────────────────────────────────────────────────────────────
+  // ── Sort ─────────────────────────────────────────────────────────────────
   function applySort() {
     var sorted = wraps.slice().sort(function (wa, wb) {
       var a = wa.querySelector('.card'), b = wb.querySelector('.card');
@@ -288,6 +423,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
         if (sb === null) return -1;
         return sb - sa;
       }
+      // default: date
       var da = a.dataset.date, db = b.dataset.date;
       if (da && db) return da < db ? -1 : da > db ? 1 : 0;
       if (da) return -1;
@@ -313,11 +449,9 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     var logMin = Math.log10(Math.max(globalMin, 1));
     var logMax = Math.log10(Math.max(globalMax, 1));
     var logRange = logMax - logMin;
-    if (logRange < 0.01) return; // all prices essentially the same
+    if (logRange < 0.01) return;
 
-    var domCur = '€'; // prices are always EUR after server-side conversion
-
-    // Log-scale bins (20 bins, uniform in log space → fine at low end)
+    var domCur = '€';
     var BINS = 20;
     var binSize = logRange / BINS;
     var counts = new Array(BINS).fill(0);
@@ -342,7 +476,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       hist.appendChild(r);
     });
 
-    // Sliders run from 0..1000 in log space
     var STEPS = 1000;
     var minSlider = document.getElementById('pf-min');
     var maxSlider = document.getElementById('pf-max');
@@ -358,37 +491,28 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     function sliderToPrice(v) {
       return Math.round(Math.pow(10, logMin + (v / STEPS) * logRange));
     }
-
     function fmt(v) {
       if (v >= 1000000) return domCur + (v / 1000000).toFixed(1) + 'M';
       if (v >= 10000)   return domCur + Math.round(v / 1000) + 'k';
       return domCur + v.toLocaleString();
     }
-
     function redraw() {
       currentPriceMin = sliderToPrice(+minSlider.value);
       currentPriceMax = sliderToPrice(+maxSlider.value);
-
       document.getElementById('pf-lo').textContent = fmt(currentPriceMin);
       document.getElementById('pf-hi').textContent = fmt(currentPriceMax);
-
       var loFrac = +minSlider.value / STEPS;
       var hiFrac = +maxSlider.value / STEPS;
-
       var fill = document.getElementById('pf-fill');
       fill.style.left = (loFrac * 100) + '%';
       fill.style.width = Math.max(0, (hiFrac - loFrac) * 100) + '%';
-
-      // Bin i spans fraction [i/BINS, (i+1)/BINS] in log space
       hist.querySelectorAll('rect').forEach(function (r) {
         var i = +r.dataset.bin;
         var inRange = (i + 1) / BINS > loFrac && i / BINS < hiFrac;
         r.setAttribute('fill', inRange ? '#1a1a1a' : '#e0e0e0');
       });
-
       applyFilter();
     }
-
     minSlider.addEventListener('input', function () {
       if (+minSlider.value > +maxSlider.value) minSlider.value = maxSlider.value;
       redraw();
@@ -397,44 +521,49 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       if (+maxSlider.value < +minSlider.value) maxSlider.value = minSlider.value;
       redraw();
     });
-
     redraw();
   }
 
-  // ── Layout toggle (compact → large → by size → compact) ─────────────────
-  var _layouts = ['compact', 'large', 'bysize'];
-  var _layoutLabels = {compact: 'Large view', large: 'By Size', bysize: 'Compact view'};
+  // ── Layout toggle (5 modes) ───────────────────────────────────────────────
+  var _LAYOUTS = ['compact', 'large', 'masonry-1', 'masonry-2', 'masonry-3'];
+  var _LAYOUT_NEXT  = {compact: 'Large', large: 'Mosaic', 'masonry-1': 'Wide', 'masonry-2': 'Dense', 'masonry-3': 'Compact'};
+  var _LAYOUT_CLASS = {compact: '', large: 'grid-large', 'masonry-1': 'grid-masonry-1', 'masonry-2': 'grid-masonry-2', 'masonry-3': 'grid-masonry-3'};
   var _saved = localStorage.getItem('aw-layout') || 'compact';
-  var layoutMode = _layouts.indexOf(_saved) >= 0 ? _saved : 'compact';
+  var layoutMode = _LAYOUTS.indexOf(_saved) >= 0 ? _saved : 'compact';
+
   function applyLayout() {
-    grid.classList.toggle('grid-large', layoutMode === 'large');
-    grid.classList.toggle('grid-bysize', layoutMode === 'bysize');
-    layoutBtn.textContent = _layoutLabels[layoutMode];
+    Object.values(_LAYOUT_CLASS).forEach(function (cls) { if (cls) grid.classList.remove(cls); });
+    if (_LAYOUT_CLASS[layoutMode]) grid.classList.add(_LAYOUT_CLASS[layoutMode]);
+    layoutBtn.textContent = _LAYOUT_NEXT[layoutMode];
     localStorage.setItem('aw-layout', layoutMode);
   }
   applyLayout();
+
   layoutBtn.addEventListener('click', function () {
-    layoutMode = _layouts[(_layouts.indexOf(layoutMode) + 1) % _layouts.length];
+    layoutMode = _LAYOUTS[(_LAYOUTS.indexOf(layoutMode) + 1) % _LAYOUTS.length];
     applyLayout();
   });
 
-  // ── Artist filter chips ──────────────────────────────────────────────────
+  // ── Artist chips ──────────────────────────────────────────────────────────
+  var _specialChips = ['liked-chip', 'img-chip'];
   document.getElementById('bar').addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');
-    if (!chip || chip.id === 'liked-chip') return;
-    document.querySelectorAll('.chip:not(#liked-chip)').forEach(function (c) { c.classList.remove('active'); });
+    if (!chip || _specialChips.indexOf(chip.id) >= 0) return;
+    document.querySelectorAll('.chip').forEach(function (c) {
+      if (_specialChips.indexOf(c.id) < 0) c.classList.remove('active');
+    });
     chip.classList.add('active');
     activeArtist = chip.dataset.artist;
     applyFilter();
   });
 
-  // ── Sort ─────────────────────────────────────────────────────────────────
+  // ── Sort ──────────────────────────────────────────────────────────────────
   sortSel.addEventListener('change', function () {
     sortMode = sortSel.value;
     applySort();
   });
 
-  // ── Add artist ───────────────────────────────────────────────────────────
+  // ── Add artist ────────────────────────────────────────────────────────────
   var GH_TOKEN = {{ github_token | tojson }};
   if (GH_TOKEN) {
     var addBar = document.getElementById('add-bar');
@@ -457,13 +586,136 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
           msg.textContent = '✓ ' + name + ' queued — will appear after the next digest run';
           document.getElementById('add-input').value = '';
         } else {
-          r.text().then(function(t) { msg.textContent = 'Error ' + r.status + ': check token permissions'; });
+          r.text().then(function () { msg.textContent = 'Error ' + r.status + ': check token permissions'; });
         }
       }).catch(function () { msg.textContent = 'Network error'; });
     });
   }
 
-  // ── Init ─────────────────────────────────────────────────────────────────
+  // ── Fullscreen ────────────────────────────────────────────────────────────
+  var fsOverlay  = document.getElementById('fs-overlay');
+  var fsImg      = document.getElementById('fs-img');
+  var fsArtist   = document.getElementById('fs-artist');
+  var fsTitle    = document.getElementById('fs-title');
+  var fsHouse    = document.getElementById('fs-house');
+  var fsEstimate = document.getElementById('fs-estimate');
+  var fsDims     = document.getElementById('fs-dims');
+  var fsDate     = document.getElementById('fs-date');
+  var fsLink     = document.getElementById('fs-link');
+  var fsCount    = document.getElementById('fs-count');
+  var fsStyleBtn = document.getElementById('fs-style-btn');
+
+  var FS_STYLES  = ['fs-v1', 'fs-v2', 'fs-v3'];
+  var FS_LABELS  = {'fs-v1': 'Gallery', 'fs-v2': 'Museum', 'fs-v3': 'Editorial'};
+  var fsStyle = localStorage.getItem('aw-fs-style') || 'fs-v1';
+  if (FS_STYLES.indexOf(fsStyle) < 0) fsStyle = 'fs-v1';
+  var fsIndex = 0;
+  var fsLots = [];
+
+  function fsSwitchStyle() {
+    FS_STYLES.forEach(function (s) { fsOverlay.classList.remove(s); });
+    fsOverlay.classList.add(fsStyle);
+    fsStyleBtn.textContent = FS_LABELS[fsStyle];
+    localStorage.setItem('aw-fs-style', fsStyle);
+  }
+
+  function fsOpen(index) {
+    fsLots = wraps.filter(function (w) { return !w.hidden; });
+    if (!fsLots.length) return;
+    fsIndex = Math.max(0, Math.min(index, fsLots.length - 1));
+    document.body.style.overflow = 'hidden';
+    fsOverlay.hidden = false;
+    fsSwitchStyle();
+    fsShow();
+  }
+
+  function fsClose() {
+    fsOverlay.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function fsShow() {
+    var wrap    = fsLots[fsIndex];
+    var card    = wrap.querySelector('.card');
+    var imgEl   = wrap.querySelector('.card-img');
+    var artistEl = wrap.querySelector('.card-artist');
+    var titleEl  = wrap.querySelector('.card-title a');
+    var houseEl  = wrap.querySelector('.card-house');
+    var dateEl   = wrap.querySelector('.card-date');
+    var dimsEl   = wrap.querySelector('.card-dims');
+
+    if (imgEl && imgEl.src && !imgEl.src.endsWith('/')) {
+      fsImg.src = imgEl.src;
+      fsImg.style.display = '';
+    } else {
+      fsImg.src = '';
+      fsImg.style.display = 'none';
+    }
+    fsArtist.textContent   = artistEl ? artistEl.textContent.trim() : '';
+    fsTitle.textContent    = titleEl  ? titleEl.textContent.trim()  : '';
+    fsHouse.textContent    = houseEl  ? houseEl.textContent.trim()  : '';
+    fsEstimate.textContent = card.dataset.estimateText || '';
+    fsDims.textContent     = dimsEl   ? dimsEl.textContent.trim()   : '';
+    fsDate.textContent     = dateEl   ? dateEl.textContent.trim()   : '';
+    fsLink.href            = card.dataset.url;
+
+    fsEstimate.style.display = fsEstimate.textContent ? '' : 'none';
+    fsDims.style.display     = fsDims.textContent     ? '' : 'none';
+    fsCount.textContent = (fsIndex + 1) + ' / ' + fsLots.length;
+  }
+
+  document.getElementById('fs-prev').addEventListener('click', function () {
+    if (!fsLots.length) return;
+    fsIndex = (fsIndex - 1 + fsLots.length) % fsLots.length;
+    fsShow();
+  });
+  document.getElementById('fs-next').addEventListener('click', function () {
+    if (!fsLots.length) return;
+    fsIndex = (fsIndex + 1) % fsLots.length;
+    fsShow();
+  });
+  document.getElementById('fs-close').addEventListener('click', fsClose);
+
+  fsStyleBtn.addEventListener('click', function () {
+    var i = FS_STYLES.indexOf(fsStyle);
+    fsStyle = FS_STYLES[(i + 1) % FS_STYLES.length];
+    fsSwitchStyle();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (fsOverlay.hidden) return;
+    if (e.key === 'Escape') { fsClose(); return; }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      fsIndex = (fsIndex + 1) % fsLots.length; fsShow();
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      fsIndex = (fsIndex - 1 + fsLots.length) % fsLots.length; fsShow();
+    }
+  });
+
+  // Click card image → open fullscreen at that lot
+  wraps.forEach(function (wrap) {
+    var imgLink = wrap.querySelector('.card-img-link');
+    if (!imgLink) return;
+    imgLink.addEventListener('click', function (e) {
+      var visible = wraps.filter(function (w) { return !w.hidden; });
+      var i = visible.indexOf(wrap);
+      if (i >= 0) { e.preventDefault(); fsOpen(i); }
+    });
+  });
+
+  document.getElementById('fs-btn').addEventListener('click', function () { fsOpen(0); });
+
+  // ── Back to top ───────────────────────────────────────────────────────────
+  var backTop = document.getElementById('back-top');
+  window.addEventListener('scroll', function () {
+    backTop.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+  backTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────
   initPriceFilter();
 }());
 </script>
