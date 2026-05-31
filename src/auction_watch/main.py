@@ -61,24 +61,77 @@ SCRAPERS = [
 
 SCRAPER_TIMEOUT = 300  # seconds; kills any scraper that hangs
 
+# Invaluable house name keywords → our scraper source name.
+# Used to deduplicate Invaluable lots already covered by a direct scraper.
+_INVALUABLE_HOUSE_MAP: list[tuple[str, str]] = [
+    ("van ham", "vanham"),
+    ("bonham", "bonhams"),
+    ("drouot", "drouot"),
+    ("phillips", "phillips"),
+]
 
-async def _gather_lots(artists: list[Artist]) -> list[Lot]:
+
+def _invaluable_direct_source(house: str) -> str | None:
+    h = house.lower()
+    for keyword, source in _INVALUABLE_HOUSE_MAP:
+        if keyword in h:
+            return source
+    return None
+
+
+async def _fetch_eur_rates(client: httpx.AsyncClient) -> dict[str, float]:
+    """Fetch EUR-based exchange rates from frankfurter.app (free, no key required)."""
+    try:
+        r = await client.get(
+            "https://api.frankfurter.app/latest?base=EUR", timeout=10.0
+        )
+        r.raise_for_status()
+        rates: dict[str, float] = r.json().get("rates", {})
+        rates["EUR"] = 1.0
+        return rates
+    except Exception as e:
+        log.warning("EUR rate fetch failed: %s", e)
+        return {}
+
+
+async def _gather_lots(artists: list[Artist]) -> tuple[list[Lot], dict[str, float]]:
     async with httpx.AsyncClient() as client:
-        results = await asyncio.gather(
-            *(
-                asyncio.wait_for(s.collect(client, artists), timeout=SCRAPER_TIMEOUT)
-                for s in SCRAPERS
+        scraper_results, eur_rates = await asyncio.gather(
+            asyncio.gather(
+                *(
+                    asyncio.wait_for(s.collect(client, artists), timeout=SCRAPER_TIMEOUT)
+                    for s in SCRAPERS
+                ),
+                return_exceptions=True,
             ),
-            return_exceptions=True,
+            _fetch_eur_rates(client),
         )
     out: list[Lot] = []
-    for scraper, res in zip(SCRAPERS, results):
+    for scraper, res in zip(SCRAPERS, scraper_results):
         if isinstance(res, Exception):
             log.error("%s scraper failed: %s", scraper.name, res)
             continue
         log.info("%s: %d lots returned", scraper.name, len(res))
         out.extend(res)
-    return out
+    return out, eur_rates
+
+
+def _apply_eur_prices(lots: list[Lot], rates: dict[str, float]) -> None:
+    """Set estimate_eur (midpoint) on each lot using today's exchange rates."""
+    for lot in lots:
+        code = lot.currency_code
+        if not code or code not in rates:
+            continue
+        rate = rates[code]  # units of code per 1 EUR
+        if lot.estimate_low and lot.estimate_high:
+            mid = (lot.estimate_low + lot.estimate_high) / 2
+        elif lot.estimate_low:
+            mid = float(lot.estimate_low)
+        elif lot.estimate_high:
+            mid = float(lot.estimate_high)
+        else:
+            continue
+        lot.estimate_eur = round(mid / rate)
 
 
 def _within_window(lots: list[Lot], days: int) -> list[Lot]:
@@ -111,12 +164,35 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
         if lot.source != "artsy" and lot.close_date is not None:
             direct_keys.add((_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()))
 
-    return [
+    out = [
         lot for lot in out
         if not (
             lot.source == "artsy"
             and lot.close_date is not None
             and (_norm(lot.artist), _norm(lot.title)[:30], lot.close_date.date()) in direct_keys
+        )
+    ]
+
+    # Pass 3: Invaluable dedup — Invaluable aggregates houses we also scrape directly
+    # (Van Ham, Bonhams, …). When a direct-source lot exists for the same
+    # (artist, date-day), prefer the direct lot (it has a working image URL).
+    # Title matching is intentionally skipped: titles may differ by language.
+    direct_by_source: dict[str, set[tuple]] = {}
+    for lot in out:
+        mapped = _invaluable_direct_source(lot.house)
+        if lot.source == mapped and lot.close_date is not None:
+            direct_by_source.setdefault(mapped, set()).add(
+                (_norm(lot.artist), lot.close_date.date())
+            )
+
+    return [
+        lot for lot in out
+        if not (
+            lot.source == "invaluable"
+            and lot.close_date is not None
+            and (mapped := _invaluable_direct_source(lot.house)) is not None
+            and (_norm(lot.artist), lot.close_date.date())
+            in direct_by_source.get(mapped, set())
         )
     ]
 
@@ -130,9 +206,10 @@ def cli():
     if os.environ.get("EMPTY_PREVIEW") == "1":
         lots: list[Lot] = []
     else:
-        all_lots = asyncio.run(_gather_lots(artists))
+        all_lots, eur_rates = asyncio.run(_gather_lots(artists))
         in_window = _within_window(all_lots, LOOKAHEAD_DAYS)
         lots = _dedupe(in_window)
+        _apply_eur_prices(lots, eur_rates)
         log.info(
             "Total: %d scraped, %d in %d-day window, %d after dedupe",
             len(all_lots),

@@ -2,6 +2,12 @@ import re
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl
 
+# Map currency symbol → ISO code. $ is assumed USD (most common case).
+_SYMBOL_TO_CODE: dict[str, str] = {
+    "$": "USD", "£": "GBP", "€": "EUR", "¥": "JPY",
+    "CHF": "CHF", "HK$": "HKD", "A$": "AUD", "C$": "CAD",
+}
+
 
 class Lot(BaseModel):
     source: str
@@ -14,8 +20,15 @@ class Lot(BaseModel):
     estimate_low: int | None = None
     estimate_high: int | None = None
     currency: str | None = None
-    dimensions: str | None = None  # e.g. "50 × 60 cm" — Artsy only for now
+    dimensions: str | None = None  # e.g. "50 × 60 cm"
+    estimate_eur: int | None = None  # midpoint converted to EUR post-scrape
     is_new: bool = False
+
+    @property
+    def currency_code(self) -> str | None:
+        if not self.currency:
+            return None
+        return _SYMBOL_TO_CODE.get(self.currency.strip())
 
     @property
     def dedupe_key(self) -> str:

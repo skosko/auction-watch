@@ -56,6 +56,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 .card-title a:hover{text-decoration:underline}
 .card-house{font-size:12px;color:#555}
 .card-estimate{font-size:12px;color:#555}
+.card-eur{font-size:11px;color:#aaa}
 .card-dims{font-size:11px;color:#aaa}
 .card-date{font-size:12px;color:#d4541a;margin-top:4px}
 #empty{display:none;text-align:center;padding:80px 24px;color:#777;font-size:15px}
@@ -122,8 +123,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     data-artist="{{ lot.artist }}"
     data-date="{{ lot.close_date.isoformat() if lot.close_date else '' }}"
     data-house="{{ lot.house }}"
-    data-price="{{ lot.estimate_low if lot.estimate_low is not none else '' }}"
-    data-currency="{{ lot.currency or '' }}"
+    data-price="{{ lot.estimate_eur if lot.estimate_eur is not none else '' }}"
+    data-currency="€"
     data-area="{{ lot.area_cm2 if lot.area_cm2 is not none else '' }}">
     {% if lot.image_url -%}
     <a href="{{ lot.url }}" target="_blank" rel="noopener" class="card-img-link">
@@ -139,7 +140,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
       </div>
       <div class="card-title"><a href="{{ lot.url }}" target="_blank" rel="noopener">{{ lot.title }}</a></div>
       <div class="card-house">{{ lot.house }}</div>
-      <div class="card-estimate">{{ lot | estimate }}</div>
+      <div class="card-estimate">{{ lot | estimate }}{% if lot.estimate_eur is not none and lot.currency and lot.currency.strip() != '€' %} <span class="card-eur">(~€{{ "{:,}".format(lot.estimate_eur) }})</span>{% endif %}</div>
       {% if lot.dimensions %}<div class="card-dims">{{ lot.dimensions }}</div>{% endif %}
       <div class="card-date">
         {%- if lot.close_date -%}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{%- else -%}Available now{%- endif -%}
@@ -215,14 +216,11 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
 
   // ── Price filter (log-scale) ─────────────────────────────────────────────
   function initPriceFilter() {
-    var prices = [], currencyTally = {};
+    var prices = [];
     cards.forEach(function (c) {
       if (c.dataset.price !== '') {
         var p = parseInt(c.dataset.price, 10);
         if (p > 0) prices.push(p);
-      }
-      if (c.dataset.currency) {
-        currencyTally[c.dataset.currency] = (currencyTally[c.dataset.currency] || 0) + 1;
       }
     });
     if (prices.length < 4) return;
@@ -234,9 +232,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em}
     var logRange = logMax - logMin;
     if (logRange < 0.01) return; // all prices essentially the same
 
-    var domCur = Object.keys(currencyTally).reduce(function (a, b) {
-      return currencyTally[a] >= currencyTally[b] ? a : b;
-    }, '$');
+    var domCur = '€'; // prices are always EUR after server-side conversion
 
     // Log-scale bins (20 bins, uniform in log space → fine at low end)
     var BINS = 20;
