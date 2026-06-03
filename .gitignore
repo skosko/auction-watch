@@ -1,6 +1,8 @@
 .env
 .DS_Store
 last_digest.html
+seen_lots.json
+drouot_sale_cache.json
 state.db
 __pycache__/
 *.pyc
