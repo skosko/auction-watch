@@ -13,6 +13,7 @@ Concurrency: 10 (pure API calls, fast).
 import asyncio
 import logging
 import re
+import unicodedata
 from datetime import datetime, timezone
 
 import httpx

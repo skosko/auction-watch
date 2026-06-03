@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import re
@@ -89,7 +90,7 @@ async def _fetch_eur_rates(client: httpx.AsyncClient) -> dict[str, float]:
     """Fetch EUR-based exchange rates from frankfurter.app (free, no key required)."""
     try:
         r = await client.get(
-            "https://api.frankfurter.app/latest?base=EUR", timeout=10.0
+            "https://api.frankfurter.dev/v1/latest?base=EUR", timeout=10.0
         )
         r.raise_for_status()
         rates: dict[str, float] = r.json().get("rates", {})
@@ -266,6 +267,19 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
     ]
 
 
+_SEEN_FILE = Path("seen_lots.json")
+
+
+def _load_seen() -> set[str]:
+    if _SEEN_FILE.exists():
+        return set(json.loads(_SEEN_FILE.read_text(encoding="utf-8")))
+    return set()
+
+
+def _save_seen(keys: set[str]) -> None:
+    _SEEN_FILE.write_text(json.dumps(sorted(keys)), encoding="utf-8")
+
+
 def cli():
     recipient = os.environ.get("DIGEST_RECIPIENT")
 
@@ -287,25 +301,44 @@ def cli():
             len(lots),
         )
 
-    cat = cat_image_url() if not lots else None
-    artist_slugs = {a.name: a.slug for a in artists}
-    html = render_digest(lots, cat_image_url=cat, artist_slugs=artist_slugs)
+    # Mark new lots and compute the delta for the email digest.
+    seen = _load_seen()
+    for lot in lots:
+        if lot.dedupe_key not in seen:
+            lot.is_new = True
+    new_lots = [lot for lot in lots if lot.is_new]
+    log.info("New lots: %d of %d", len(new_lots), len(lots))
 
+    artist_slugs = {a.name: a.slug for a in artists}
+
+    # Email contains only new lots (the delta).
+    cat = cat_image_url() if not new_lots else None
+    html = render_digest(new_lots, cat_image_url=cat, artist_slugs=artist_slugs)
     out = Path("last_digest.html")
     out.write_text(html, encoding="utf-8")
     log.info("Wrote %s", out.resolve())
 
+    # Web view shows all lots, with NEW badges on fresh ones.
     web = render_web(lots, artist_slugs=artist_slugs, github_token=os.environ.get("ADD_ARTIST_TOKEN", ""))
     web_out = Path("_site/index.html")
     web_out.parent.mkdir(exist_ok=True)
     web_out.write_text(web, encoding="utf-8")
     log.info("Wrote %s", web_out.resolve())
 
+    # Persist seen keys — only keys still in the current scrape window,
+    # so entries for past auctions naturally expire.
+    current_keys = {lot.dedupe_key for lot in lots}
+    _save_seen(seen | current_keys)
+
     if not os.environ.get("RESEND_API_KEY"):
         log.info("RESEND_API_KEY not set — skipping send.")
         return
     if not recipient:
         log.info("DIGEST_RECIPIENT not set — skipping send.")
+        return
+
+    if not new_lots:
+        log.info("No new lots — skipping send.")
         return
 
     result = send_digest(html, recipient)
