@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 
 name = "artsy"
 
-MAX_RETRIES = 3
-RETRY_BASE_DELAY = 0.8  # seconds; doubles each attempt
+MAX_RETRIES = 5
+RETRY_BASE_DELAY = 2.0  # seconds; doubles each attempt
 ARTIST_CONCURRENCY = 3
 
 METAPHYSICS = "https://metaphysics-cdn.artsy.net/v2"
