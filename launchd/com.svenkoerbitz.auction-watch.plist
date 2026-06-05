@@ -10,12 +10,12 @@
         <string>/opt/homebrew/bin/uv</string>
         <string>run</string>
         <string>--directory</string>
-        <string>/Users/sven.koerbitz/projects/auction-watch</string>
+        <string>/Users/sven/Claude/projects/auction-watch</string>
         <string>auction-watch</string>
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/sven.koerbitz/projects/auction-watch</string>
+    <string>/Users/sven/Claude/projects/auction-watch</string>
 
     <key>StartCalendarInterval</key>
     <dict>
@@ -28,10 +28,10 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>/Users/sven.koerbitz/Library/Logs/auction-watch.log</string>
+    <string>/Users/sven/Library/Logs/auction-watch.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/sven.koerbitz/Library/Logs/auction-watch.log</string>
+    <string>/Users/sven/Library/Logs/auction-watch.log</string>
 
     <key>RunAtLoad</key>
     <false/>
