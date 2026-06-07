@@ -610,31 +610,27 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
     applySort();
   });
 
-  // ── GitHub Contents API helpers ──────────────────────────────────────────
-  var GH_TOKEN = {{ github_token | tojson }};
-  var GH_REPO = 'skosko/auction-watch';
-  var GH_FILE = 'artists.yml';
+  // ── Proxy API helpers ───────────────────────────────────────────────────
+  var PROXY_URL = {{ proxy_url | tojson }};
 
   function ghGetFile() {
-    return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
-      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
-    }).then(function (r) { return r.json(); });
+    return fetch(PROXY_URL + '/file').then(function (r) { return r.json(); });
   }
 
   function ghPutFile(content, sha, message) {
     var body = { message: message, content: btoa(unescape(encodeURIComponent(content))), sha: sha };
-    return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+    return fetch(PROXY_URL + '/file', {
       method: 'PUT',
-      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     }).then(function (r) {
       if (r.status === 409) {
         return ghGetFile().then(function (fresh) {
           body.sha = fresh.sha;
           body.content = btoa(unescape(encodeURIComponent(content)));
-          return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+          return fetch(PROXY_URL + '/file', {
             method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
           });
         });
@@ -796,7 +792,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
   }
 
   // ── Add / Manage toggles ───────────────────────────────────────────────
-  if (GH_TOKEN) {
+  if (PROXY_URL) {
     var addToggle = document.getElementById('add-toggle');
     var manageToggle = document.getElementById('manage-toggle');
     var addBar = document.getElementById('add-bar');

@@ -89,10 +89,17 @@ search_terms:
 
 ### Website artist management
 
-When `ADD_ARTIST_TOKEN` is set (a GitHub token with `contents:write` scope), the website shows **+ Add** and **Manage** buttons:
+When `PROXY_URL` is set, the website shows **+ Add** and **Manage** buttons:
 
-- **+ Add**: Type to search Artsy's artist database with autocomplete. Click a result to add it to `artists.yml` via the GitHub Contents API. You can also add a free-text search term from the bottom of the dropdown.
+- **+ Add**: Type to search Artsy's artist database with autocomplete. Click a result to add it to `artists.yml` via a Cloudflare Worker proxy. You can also add a free-text search term from the bottom of the dropdown.
 - **Manage**: Shows all tracked artists and search terms with delete buttons. Removals commit directly to `artists.yml`.
+
+The proxy keeps the GitHub PAT server-side (GitHub auto-revokes tokens found in public repos). Setup:
+
+1. `npm install -g wrangler && wrangler login`
+2. `cd worker && wrangler deploy`
+3. `wrangler secret put GITHUB_TOKEN` (paste a PAT with `contents:write` scope)
+4. Add `PROXY_URL` as a GitHub repo secret, e.g. `https://auction-watch-proxy.<account>.workers.dev`
 
 ### Email favourites
 
