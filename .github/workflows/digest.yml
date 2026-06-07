@@ -42,7 +42,7 @@ jobs:
           TOKEN: ${{ secrets.ADD_ARTIST_TOKEN }}
         run: |
           if [ -z "$TOKEN" ]; then echo "No ADD_ARTIST_TOKEN set, skipping"; exit 0; fi
-          ENCODED=$(printf '%s' "$TOKEN" | base64)
+          ENCODED=$(printf '%s' "$TOKEN" | base64 -w 0)
           git fetch origin gh-pages
           git checkout gh-pages
           printf "var GH_TOKEN = atob('%s');\n" "$ENCODED" > config.js
