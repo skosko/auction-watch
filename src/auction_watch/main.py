@@ -367,6 +367,7 @@ def cli():
     web = render_web(
         lots,
         artist_slugs=artist_slugs,
+        github_token=os.environ.get("ADD_ARTIST_TOKEN", ""),
         tracked_artists=artists,
         search_terms=search_terms,
     )
