@@ -366,6 +366,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
 <!-- Back to top -->
 <button id="back-top" aria-label="Back to top">↑</button>
 
+<script>var GH_TOKEN = '';</script>
+<script src="config.js" onerror="void 0"></script>
 <script>
 (function () {
   var grid = document.getElementById('grid');
@@ -611,7 +613,6 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
   });
 
   // ── GitHub Contents API helpers ──────────────────────────────────────────
-  var GH_TOKEN = {{ github_token | tojson }};
   var GH_REPO = 'skosko/auction-watch';
   var GH_FILE = 'artists.yml';
 

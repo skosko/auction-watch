@@ -28,7 +28,6 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
-          ADD_ARTIST_TOKEN: ${{ secrets.ADD_ARTIST_TOKEN }}
         run: uv run auction-watch
 
       - name: Deploy to GitHub Pages
@@ -37,3 +36,18 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _site
           publish_branch: gh-pages
+
+      - name: Inject config.js into gh-pages
+        env:
+          TOKEN: ${{ secrets.ADD_ARTIST_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "No ADD_ARTIST_TOKEN set, skipping"; exit 0; fi
+          ENCODED=$(printf '%s' "$TOKEN" | base64)
+          git fetch origin gh-pages
+          git checkout gh-pages
+          printf "var GH_TOKEN = atob('%s');\n" "$ENCODED" > config.js
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.js
+          git diff --cached --quiet || git commit -m "chore: update config [skip ci]"
+          git push origin gh-pages

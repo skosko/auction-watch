@@ -53,7 +53,6 @@ def render_digest(
 def render_web(
     lots: list[Lot],
     artist_slugs: dict[str, str] | None = None,
-    github_token: str = "",
     tracked_artists: list[Artist] | None = None,
     search_terms: list[str] | None = None,
 ) -> str:
@@ -68,7 +67,6 @@ def render_web(
         artists=artists,
         generated_at=datetime.now(timezone.utc),
         artist_slugs=artist_slugs or {},
-        github_token=github_token,
         tracked_artists=tracked_artists or [],
         search_terms=search_terms or [],
     )
