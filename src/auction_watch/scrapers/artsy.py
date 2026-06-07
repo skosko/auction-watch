@@ -142,6 +142,8 @@ async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]
     sem = asyncio.Semaphore(ARTIST_CONCURRENCY)
 
     async def _one(artist: Artist) -> list[Lot]:
+        if not artist.slug:
+            return []
         async with sem:
             try:
                 lots = await search(client, artist.slug, artist.name)

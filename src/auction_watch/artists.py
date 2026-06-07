@@ -17,3 +17,8 @@ def load_artists(path: Path | str = "artists.yml") -> list[Artist]:
         Artist(name=a["name"], slug=a["slug"], bio=a.get("bio"))
         for a in data.get("artists", [])
     ]
+
+
+def load_search_terms(path: Path | str = "artists.yml") -> list[str]:
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    return list(data.get("search_terms", []))

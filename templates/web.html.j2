@@ -35,12 +35,30 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
 #pf-sliders input::-webkit-slider-runnable-track{height:4px;background:transparent}
 
 /* ─ add-artist bar ───────────────────────────────────────────────────── */
-#add-bar{display:none;padding:8px 24px 10px;background:#fafafa;border-bottom:1px solid #eaeaea;align-items:center;gap:10px}
-#add-input{border:1px solid #d0d0d0;border-radius:100px;padding:4px 14px;font-size:13px;width:260px;outline:none}
+#add-bar{display:none;padding:8px 24px 10px;background:#fafafa;border-bottom:1px solid #eaeaea;align-items:center;gap:10px;flex-wrap:wrap}
+#add-wrap{position:relative;display:inline-block}
+#add-input{border:1px solid #d0d0d0;border-radius:100px;padding:4px 14px;font-size:13px;width:300px;outline:none}
 #add-input:focus{border-color:#1a1a1a}
-#add-btn{padding:4px 14px;border-radius:100px;border:1px solid #1a1a1a;background:#1a1a1a;color:#fff;font-size:12px;cursor:pointer}
-#add-btn:hover{background:#333}
+#add-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d0d0d0;border-radius:8px;margin-top:4px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:100;overflow:hidden;max-height:320px;overflow-y:auto}
+.add-option{padding:8px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0}
+.add-option:last-child{border-bottom:none}
+.add-option:hover{background:#f6f6f4}
+.add-option-name{font-weight:500;color:#1a1a1a}
+.add-option-bio{font-size:11px;color:#888;margin-top:1px}
+.add-option-term{color:#555;font-style:italic}
 #add-msg{font-size:12px;color:#555}
+
+/* ─ manage panel ─────────────────────────────────────────────────────── */
+#manage-panel{display:none;padding:12px 24px 16px;background:#fafafa;border-bottom:1px solid #eaeaea}
+.manage-section{margin-bottom:10px}
+.manage-section:last-child{margin-bottom:0}
+.manage-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.manage-list{display:flex;flex-wrap:wrap;gap:6px}
+.manage-item{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;border:1px solid #d0d0d0;background:#fff;font-size:12px;color:#1a1a1a}
+.manage-item .remove-btn{background:none;border:none;cursor:pointer;color:#aaa;font-size:13px;padding:0 0 0 2px;line-height:1}
+.manage-item .remove-btn:hover{color:#e0345a}
+@keyframes highlight-fade{0%{background:#fffbe6}100%{background:transparent}}
+.highlight-card{animation:highlight-fade 2s ease-out}
 
 /* ─ grid / cards ─────────────────────────────────────────────────────── */
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:20px 24px;max-width:1600px;margin:0 auto}
@@ -50,8 +68,11 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
 .card-img-link{display:block;aspect-ratio:4/3;background:#f0f0f0;overflow:hidden;cursor:zoom-in}
 .grid-large .card-img-link{aspect-ratio:3/2}
 .card-img{width:100%;height:100%;object-fit:contain;display:block}
-.card-img-ph{aspect-ratio:4/3;background:#f0f0f0}
+.card-img-ph{aspect-ratio:4/3;background:#f0f0f0;display:flex;flex-direction:column;justify-content:center;padding:20px 18px}
+.card-img-ph .ph-artist{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.1em}
+.card-img-ph .ph-title{font-size:20px;font-weight:600;line-height:1.2;color:#555;margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .grid-large .card-img-ph{aspect-ratio:3/2}
+.grid-large .card-img-ph .ph-title{font-size:24px}
 .card-body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;gap:3px}
 .card-artist{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.06em}
 .card-artist a{color:#888;text-decoration:none}
@@ -223,6 +244,8 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
       <option value="price-desc">Sort: Price ↓</option>
       <option value="size-desc">Sort: Size ↓</option>
     </select>
+    <button id="add-toggle" class="bar-ctrl" style="display:none">+ Add</button>
+    <button id="manage-toggle" class="bar-ctrl" style="display:none">Manage</button>
     <button id="layout-btn" class="bar-ctrl">Large</button>
     <button id="fs-btn" class="bar-ctrl">Fullscreen</button>
   </div>
@@ -239,9 +262,30 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
 </div>
 
 <div id="add-bar">
-  <input id="add-input" type="text" placeholder="Add artist by name…" autocomplete="off">
-  <button id="add-btn">Add</button>
+  <div id="add-wrap">
+    <input id="add-input" type="text" placeholder="Search artists to add…" autocomplete="off">
+    <div id="add-dropdown"></div>
+  </div>
   <span id="add-msg"></span>
+</div>
+
+<div id="manage-panel">
+  <div class="manage-section">
+    <div class="manage-label">Tracked artists</div>
+    <div class="manage-list" id="manage-artists">
+      {% for a in tracked_artists -%}
+      <span class="manage-item" data-name="{{ a.name }}" data-type="artist"><span>{{ a.name }}</span><button class="remove-btn" title="Remove">&times;</button></span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="manage-section">
+    <div class="manage-label">Search terms</div>
+    <div class="manage-list" id="manage-terms">
+      {% for t in search_terms -%}
+      <span class="manage-item" data-name="{{ t }}" data-type="term"><span>{{ t }}</span><button class="remove-btn" title="Remove">&times;</button></span>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 
 <main id="grid">
@@ -259,10 +303,13 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
     data-has-image="{{ '1' if lot.image_url else '' }}">
     {% if lot.image_url -%}
     <a href="{{ lot.url }}" target="_blank" rel="noopener" class="card-img-link">
-      <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'">
+      <img class="card-img" src="{{ lot.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="var w=this.closest('.card-wrap')||this.closest('.card');var a=this.parentElement;var ph=document.createElement('div');ph.className='card-img-ph';ph.innerHTML='<div class=ph-artist>'+a.closest('.card').dataset.artist+'</div><div class=ph-title>'+a.closest('.card').querySelector('.card-title').textContent.trim()+'</div>';a.replaceWith(ph);if(w)w.querySelector('.card').dataset.hasImage=''">
     </a>
     {%- else -%}
-    <div class="card-img-ph"></div>
+    <div class="card-img-ph">
+      <div class="ph-artist">{{ lot.artist }}</div>
+      <div class="ph-title">{{ lot.title }}</div>
+    </div>
     {%- endif %}
     <div class="card-body">
       <div class="card-artist">
@@ -563,34 +610,240 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
     applySort();
   });
 
-  // ── Add artist ────────────────────────────────────────────────────────────
+  // ── GitHub Contents API helpers ──────────────────────────────────────────
   var GH_TOKEN = {{ github_token | tojson }};
-  if (GH_TOKEN) {
-    var addBar = document.getElementById('add-bar');
-    addBar.style.display = 'flex';
-    document.getElementById('add-btn').addEventListener('click', function () {
-      var name = document.getElementById('add-input').value.trim();
-      if (!name) return;
-      var msg = document.getElementById('add-msg');
-      msg.textContent = 'Queuing…';
-      fetch('https://api.github.com/repos/skosko/auction-watch/actions/workflows/add-artist.yml/dispatches', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + GH_TOKEN,
-          'Accept': 'application/vnd.github+json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ref: 'main', inputs: { artist_name: name } }),
-      }).then(function (r) {
-        if (r.status === 204) {
-          msg.textContent = '✓ ' + name + ' queued — will appear after the next digest run';
-          document.getElementById('add-input').value = '';
-        } else {
-          r.text().then(function () { msg.textContent = 'Error ' + r.status + ': check token permissions'; });
-        }
-      }).catch(function () { msg.textContent = 'Network error'; });
+  var GH_REPO = 'skosko/auction-watch';
+  var GH_FILE = 'artists.yml';
+
+  function ghGetFile() {
+    return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
+    }).then(function (r) { return r.json(); });
+  }
+
+  function ghPutFile(content, sha, message) {
+    var body = { message: message, content: btoa(unescape(encodeURIComponent(content))), sha: sha };
+    return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      if (r.status === 409) {
+        return ghGetFile().then(function (fresh) {
+          body.sha = fresh.sha;
+          body.content = btoa(unescape(encodeURIComponent(content)));
+          return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+        });
+      }
+      return r;
     });
   }
+
+  function decodeGhContent(data) {
+    return decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+  }
+
+  function yamlAddArtist(yaml, name, slug, bio) {
+    var entry = '  - name: "' + name.replace(/"/g, '\\"') + '"\n    slug: ' + slug + '\n';
+    if (bio) entry += '    bio: "' + bio.replace(/"/g, '\\"') + '"\n';
+    var termsIdx = yaml.indexOf('\nsearch_terms:');
+    if (termsIdx >= 0) return yaml.slice(0, termsIdx) + entry + yaml.slice(termsIdx);
+    return yaml.trimEnd() + '\n' + entry;
+  }
+
+  function yamlAddSearchTerm(yaml, term) {
+    var entry = '  - "' + term.replace(/"/g, '\\"') + '"\n';
+    var termsIdx = yaml.indexOf('\nsearch_terms:');
+    if (termsIdx >= 0) {
+      var afterHeader = termsIdx + '\nsearch_terms:'.length;
+      var rest = yaml.slice(afterHeader);
+      var nextKey = rest.search(/\n[a-z]/);
+      var insertAt = nextKey >= 0 ? afterHeader + nextKey : yaml.length;
+      return yaml.slice(0, insertAt) + entry + yaml.slice(insertAt);
+    }
+    return yaml.trimEnd() + '\n\nsearch_terms:\n' + entry;
+  }
+
+  function yamlRemoveArtist(yaml, name) {
+    var pattern = new RegExp('  - name: "' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"\\n(?:    [^\\n]*\\n)*', 'g');
+    return yaml.replace(pattern, '');
+  }
+
+  function yamlRemoveSearchTerm(yaml, term) {
+    var escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return yaml.replace(new RegExp('  - "' + escaped + '"\\n', 'g'), '');
+  }
+
+  // ── Artsy autocomplete ─────────────────────────────────────────────────
+  var _debounceTimer = null;
+  var addInput = document.getElementById('add-input');
+  var addDropdown = document.getElementById('add-dropdown');
+  var addMsg = document.getElementById('add-msg');
+
+  function artsySearch(query) {
+    return fetch('https://metaphysics-cdn.artsy.net/v2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: 'query($q:String!){searchConnection(query:$q,entities:[ARTIST],first:5){edges{node{... on Artist{displayLabel slug bio}}}}}',
+        variables: { q: query }
+      })
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      var edges = data && data.data && data.data.searchConnection && data.data.searchConnection.edges;
+      return (edges || []).map(function (e) { return e.node; });
+    });
+  }
+
+  function showDropdown(results, query) {
+    addDropdown.innerHTML = '';
+    results.forEach(function (artist) {
+      var div = document.createElement('div');
+      div.className = 'add-option';
+      div.innerHTML = '<div class="add-option-name"></div>' + (artist.bio ? '<div class="add-option-bio"></div>' : '');
+      div.querySelector('.add-option-name').textContent = artist.displayLabel || '';
+      if (artist.bio) div.querySelector('.add-option-bio').textContent = artist.bio;
+      div.addEventListener('click', function () {
+        addDropdown.style.display = 'none'; addInput.value = '';
+        doAddArtist(artist.displayLabel, artist.slug, artist.bio);
+      });
+      addDropdown.appendChild(div);
+    });
+    var termDiv = document.createElement('div');
+    termDiv.className = 'add-option';
+    var termSpan = document.createElement('div');
+    termSpan.className = 'add-option-term';
+    termSpan.textContent = 'Add \u201c' + query + '\u201d as free-text search term';
+    termDiv.appendChild(termSpan);
+    termDiv.addEventListener('click', function () {
+      addDropdown.style.display = 'none'; addInput.value = '';
+      doAddSearchTerm(query);
+    });
+    addDropdown.appendChild(termDiv);
+    addDropdown.style.display = 'block';
+  }
+
+  addInput.addEventListener('input', function () {
+    clearTimeout(_debounceTimer);
+    var q = addInput.value.trim();
+    if (q.length < 2) { addDropdown.style.display = 'none'; return; }
+    _debounceTimer = setTimeout(function () {
+      artsySearch(q).then(function (results) { showDropdown(results, q); });
+    }, 300);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!addDropdown.contains(e.target) && e.target !== addInput) addDropdown.style.display = 'none';
+  });
+
+  function doAddArtist(name, slug, bio) {
+    addMsg.textContent = 'Adding\u2026';
+    ghGetFile().then(function (file) {
+      var yaml = decodeGhContent(file);
+      if (yaml.indexOf('"' + name + '"') >= 0) { addMsg.textContent = name + ' is already tracked'; return; }
+      var updated = yamlAddArtist(yaml, name, slug, bio);
+      return ghPutFile(updated, file.sha, 'Add artist: ' + name).then(function (r) {
+        if (r.ok || r.status === 200 || r.status === 201) {
+          addMsg.textContent = '\u2713 ' + name + ' added';
+          appendManageItem('manage-artists', name, 'artist');
+        } else { addMsg.textContent = 'Error ' + r.status; }
+      });
+    }).catch(function () { addMsg.textContent = 'Network error'; });
+  }
+
+  function doAddSearchTerm(term) {
+    addMsg.textContent = 'Adding\u2026';
+    ghGetFile().then(function (file) {
+      var yaml = decodeGhContent(file);
+      if (yaml.indexOf('"' + term + '"') >= 0) { addMsg.textContent = term + ' is already tracked'; return; }
+      var updated = yamlAddSearchTerm(yaml, term);
+      return ghPutFile(updated, file.sha, 'Add search term: ' + term).then(function (r) {
+        if (r.ok || r.status === 200 || r.status === 201) {
+          addMsg.textContent = '\u2713 \u201c' + term + '\u201d added as search term';
+          appendManageItem('manage-terms', term, 'term');
+        } else { addMsg.textContent = 'Error ' + r.status; }
+      });
+    }).catch(function () { addMsg.textContent = 'Network error'; });
+  }
+
+  function doRemove(name, type) {
+    ghGetFile().then(function (file) {
+      var yaml = decodeGhContent(file);
+      var updated = type === 'artist' ? yamlRemoveArtist(yaml, name) : yamlRemoveSearchTerm(yaml, name);
+      return ghPutFile(updated, file.sha, 'Remove ' + type + ': ' + name).then(function (r) {
+        if (r.ok || r.status === 200 || r.status === 201) {
+          var container = document.getElementById(type === 'artist' ? 'manage-artists' : 'manage-terms');
+          container.querySelectorAll('.manage-item').forEach(function (item) {
+            if (item.dataset.name === name) item.remove();
+          });
+        }
+      });
+    });
+  }
+
+  function appendManageItem(containerId, name, type) {
+    var container = document.getElementById(containerId);
+    var span = document.createElement('span');
+    span.className = 'manage-item'; span.dataset.name = name; span.dataset.type = type;
+    var label = document.createElement('span'); label.textContent = name;
+    var btn = document.createElement('button'); btn.className = 'remove-btn'; btn.title = 'Remove'; btn.innerHTML = '&times;';
+    btn.addEventListener('click', function () { doRemove(name, type); });
+    span.appendChild(label); span.appendChild(btn);
+    container.appendChild(span);
+  }
+
+  // ── Add / Manage toggles ───────────────────────────────────────────────
+  if (GH_TOKEN) {
+    var addToggle = document.getElementById('add-toggle');
+    var manageToggle = document.getElementById('manage-toggle');
+    var addBar = document.getElementById('add-bar');
+    var managePanel = document.getElementById('manage-panel');
+    addToggle.style.display = ''; manageToggle.style.display = '';
+
+    addToggle.addEventListener('click', function () {
+      var showing = addBar.style.display === 'flex';
+      addBar.style.display = showing ? 'none' : 'flex';
+      if (!showing) { managePanel.style.display = 'none'; addInput.focus(); }
+    });
+    manageToggle.addEventListener('click', function () {
+      var showing = managePanel.style.display === 'block';
+      managePanel.style.display = showing ? 'none' : 'block';
+      if (!showing) addBar.style.display = 'none';
+    });
+    document.querySelectorAll('#manage-panel .remove-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var item = btn.closest('.manage-item');
+        doRemove(item.dataset.name, item.dataset.type);
+      });
+    });
+  }
+
+  // ── ?like= handler ─────────────────────────────────────────────────────
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var likeUrl = params.get('like');
+    if (!likeUrl) return;
+    // Add to likes
+    var likes = getLikes();
+    likes[likeUrl] = 1;
+    saveLikes(likes);
+    // Update like button on matching card
+    wraps.forEach(function (w) {
+      var card = w.querySelector('.card');
+      var btn = w.querySelector('.card-like');
+      if (card.dataset.url === likeUrl) {
+        updateLikeBtn(btn, likeUrl);
+        // Scroll to card with highlight
+        w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        w.querySelector('.card').classList.add('highlight-card');
+      }
+    });
+    // Clean URL
+    history.replaceState(null, '', window.location.pathname);
+  })();
 
   // ── Fullscreen ────────────────────────────────────────────────────────────
   var fsOverlay  = document.getElementById('fs-overlay');

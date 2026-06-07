@@ -10,13 +10,14 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 
-from .artists import Artist, load_artists
+from .artists import Artist, load_artists, load_search_terms
 from .mailer import cat_image_url, send_digest
 from .models import Lot
 from .render import render_digest, render_web
 from .scrapers import (
     artsy,
     bonhams,
+    catawiki,
     christies,
     dorotheum,
     drouot,
@@ -59,10 +60,15 @@ SCRAPERS = [
     firstdibs,
     vanham,
     lempertz,
+    catawiki,
 ]
 
 
 SCRAPER_TIMEOUT = 300  # seconds; kills any scraper that hangs
+# Scrapers that need longer (e.g. sequential browser loads to avoid bot detection).
+_SCRAPER_TIMEOUTS: dict[str, int] = {
+    "catawiki": 900,
+}
 
 # Invaluable house name keywords → our scraper source name.
 # Used to deduplicate Invaluable lots already covered by a direct scraper.
@@ -106,7 +112,10 @@ async def _gather_lots(artists: list[Artist]) -> tuple[list[Lot], dict[str, floa
         scraper_results, eur_rates = await asyncio.gather(
             asyncio.gather(
                 *(
-                    asyncio.wait_for(s.collect(client, artists), timeout=SCRAPER_TIMEOUT)
+                    asyncio.wait_for(
+                        s.collect(client, artists),
+                        timeout=_SCRAPER_TIMEOUTS.get(s.name, SCRAPER_TIMEOUT),
+                    )
                     for s in SCRAPERS
                 ),
                 return_exceptions=True,
@@ -267,6 +276,37 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
     ]
 
 
+IMAGE_CHECK_CONCURRENCY = 20
+IMAGE_CHECK_TIMEOUT = 5.0
+
+
+async def _validate_images(lots: list[Lot]) -> None:
+    """HEAD-check image URLs and null out broken ones."""
+    urls = {str(lot.image_url) for lot in lots if lot.image_url}
+    if not urls:
+        return
+    sem = asyncio.Semaphore(IMAGE_CHECK_CONCURRENCY)
+    bad: set[str] = set()
+
+    async def _check(client: httpx.AsyncClient, url: str) -> None:
+        async with sem:
+            try:
+                r = await client.head(url, timeout=IMAGE_CHECK_TIMEOUT, follow_redirects=True)
+                if r.status_code >= 400:
+                    bad.add(url)
+            except Exception:
+                bad.add(url)
+
+    async with httpx.AsyncClient() as client:
+        await asyncio.gather(*(_check(client, u) for u in urls))
+
+    if bad:
+        for lot in lots:
+            if lot.image_url and str(lot.image_url) in bad:
+                lot.image_url = None
+        log.info("Dropped %d broken image URL(s)", len(bad))
+
+
 _SEEN_FILE = Path("seen_lots.json")
 
 
@@ -284,12 +324,16 @@ def cli():
     recipient = os.environ.get("DIGEST_RECIPIENT")
 
     artists = load_artists("artists.yml")
-    log.info("Loaded %d artists from artists.yml", len(artists))
+    search_terms = load_search_terms("artists.yml")
+    log.info("Loaded %d artists + %d search terms from artists.yml", len(artists), len(search_terms))
+
+    # Merge search terms as synthetic Artists (empty slug) for text-based scrapers.
+    scraper_input = list(artists) + [Artist(name=t, slug="") for t in search_terms]
 
     if os.environ.get("EMPTY_PREVIEW") == "1":
         lots: list[Lot] = []
     else:
-        all_lots, eur_rates = asyncio.run(_gather_lots(artists))
+        all_lots, eur_rates = asyncio.run(_gather_lots(scraper_input))
         in_window = _within_window(all_lots, LOOKAHEAD_DAYS)
         lots = _dedupe(in_window)
         _apply_eur_prices(lots, eur_rates)
@@ -311,19 +355,35 @@ def cli():
 
     artist_slugs = {a.name: a.slug for a in artists}
 
-    # Email contains only new lots (the delta).
-    cat = cat_image_url() if not new_lots else None
-    html = render_digest(new_lots, cat_image_url=cat, artist_slugs=artist_slugs)
-    out = Path("last_digest.html")
-    out.write_text(html, encoding="utf-8")
-    log.info("Wrote %s", out.resolve())
+    # Derive site URL for email heart links.
+    site_url = os.environ.get("SITE_URL", "")
+    if not site_url:
+        gh_repo = os.environ.get("GITHUB_REPOSITORY", "")
+        if gh_repo and "/" in gh_repo:
+            owner, repo = gh_repo.split("/", 1)
+            site_url = f"https://{owner}.github.io/{repo}/"
 
-    # Web view shows all lots, with NEW badges on fresh ones.
-    web = render_web(lots, artist_slugs=artist_slugs, github_token=os.environ.get("ADD_ARTIST_TOKEN", ""))
+    # Web view renders first, with all image URLs preserved (no validation).
+    web = render_web(
+        lots,
+        artist_slugs=artist_slugs,
+        github_token=os.environ.get("ADD_ARTIST_TOKEN", ""),
+        tracked_artists=artists,
+        search_terms=search_terms,
+    )
     web_out = Path("_site/index.html")
     web_out.parent.mkdir(exist_ok=True)
     web_out.write_text(web, encoding="utf-8")
     log.info("Wrote %s", web_out.resolve())
+
+    # Validate image URLs, then render the email (broken images removed).
+    asyncio.run(_validate_images(lots))
+
+    cat = cat_image_url() if not new_lots else None
+    html = render_digest(new_lots, cat_image_url=cat, artist_slugs=artist_slugs, site_url=site_url)
+    out = Path("last_digest.html")
+    out.write_text(html, encoding="utf-8")
+    log.info("Wrote %s", out.resolve())
 
     # Persist seen keys — only keys still in the current scrape window,
     # so entries for past auctions naturally expire.

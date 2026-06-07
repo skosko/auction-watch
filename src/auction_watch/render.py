@@ -3,6 +3,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from .artists import Artist
 from .models import Lot
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
@@ -37,6 +38,7 @@ def render_digest(
     lots: list[Lot],
     cat_image_url: str | None = None,
     artist_slugs: dict[str, str] | None = None,
+    site_url: str = "",
 ) -> str:
     template = _env.get_template("email.html.j2")
     return template.render(
@@ -44,6 +46,7 @@ def render_digest(
         generated_at=datetime.now(timezone.utc),
         cat_image_url=cat_image_url,
         artist_slugs=artist_slugs or {},
+        site_url=site_url,
     )
 
 
@@ -51,6 +54,8 @@ def render_web(
     lots: list[Lot],
     artist_slugs: dict[str, str] | None = None,
     github_token: str = "",
+    tracked_artists: list[Artist] | None = None,
+    search_terms: list[str] | None = None,
 ) -> str:
     template = _env.get_template("web.html.j2")
     sorted_lots = sorted(lots, key=_sort_key)
@@ -64,4 +69,6 @@ def render_web(
         generated_at=datetime.now(timezone.utc),
         artist_slugs=artist_slugs or {},
         github_token=github_token,
+        tracked_artists=tracked_artists or [],
+        search_terms=search_terms or [],
     )

@@ -33,9 +33,8 @@
             <td style="padding:20px 32px;border-bottom:1px solid #eee;">
               {% if lot.image_url %}
               <a href="{{ lot.url }}" style="text-decoration:none;">
-                <img src="{{ lot.image_url }}" alt="" width="576" referrerpolicy="no-referrer" style="display:block;width:100%;max-width:576px;border-radius:4px;background:#f0f0f0;margin-bottom:12px;" onerror="this.style.display='none'">
+                <img src="{{ lot.image_url }}" alt="" width="576" referrerpolicy="no-referrer" style="display:block;width:100%;max-width:576px;border-radius:4px;background:#f0f0f0;margin-bottom:12px;">
               </a>
-              {% endif %}
               <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.06em;">
                 {%- set slug = artist_slugs.get(lot.artist) -%}
                 {%- if slug %}<a href="https://www.artsy.net/artist/{{ slug }}" style="color:#888;text-decoration:none;">{{ lot.artist }}</a>{%- else %}{{ lot.artist }}{%- endif -%}
@@ -49,7 +48,25 @@
               {% if lot.dimensions %}<div style="font-size:12px;color:#999;margin-top:2px;">{{ lot.dimensions }}</div>{% endif %}
               <div style="font-size:13px;color:#d4541a;margin-top:6px;">
                 {% if lot.close_date %}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{% else %}Available now{% endif %}
+                {% if site_url %}<a href="{{ site_url }}?like={{ lot.url | urlencode }}" style="text-decoration:none;color:#ccc;font-size:14px;margin-left:8px;" title="Save to favourites">&#9825;</a>{% endif %}
               </div>
+              {% else %}
+              <div style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:0.06em;">
+                {%- set slug = artist_slugs.get(lot.artist) -%}
+                {%- if slug %}<a href="https://www.artsy.net/artist/{{ slug }}" style="color:#888;text-decoration:none;">{{ lot.artist }}</a>{%- else %}{{ lot.artist }}{%- endif -%}
+                {% if lot.is_new %}<span style="color:#ffffff;background:#d4541a;padding:1px 6px;border-radius:3px;font-size:10px;margin-left:8px;letter-spacing:0.04em;">NEW</span>{% endif %}
+              </div>
+              <div style="font-size:20px;font-weight:600;margin:6px 0 10px;line-height:1.3;">
+                <a href="{{ lot.url }}" style="color:#1a1a1a;text-decoration:none;">{{ lot.title }}</a>
+              </div>
+              <div style="font-size:16px;color:#1a1a1a;font-weight:500;">{{ lot|estimate }}</div>
+              {% if lot.dimensions %}<div style="font-size:14px;color:#555;margin-top:4px;">{{ lot.dimensions }}</div>{% endif %}
+              <div style="font-size:13px;color:#555;margin-top:6px;">{{ lot.house }}</div>
+              <div style="font-size:13px;color:#d4541a;margin-top:6px;">
+                {% if lot.close_date %}Closes {{ lot.close_date.strftime('%a %b %-d, %H:%M UTC') }}{% else %}Available now{% endif %}
+                {% if site_url %}<a href="{{ site_url }}?like={{ lot.url | urlencode }}" style="text-decoration:none;color:#ccc;font-size:14px;margin-left:8px;" title="Save to favourites">&#9825;</a>{% endif %}
+              </div>
+              {% endif %}
             </td>
           </tr>
           {% endfor %}

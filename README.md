@@ -4,7 +4,7 @@ Tracks upcoming auction lots and dealer listings for a list of artists. Sends a 
 
 ## What it does
 
-- Scrapes 14 auction houses and platforms (Sotheby's, Christie's, Phillips, Bonhams, Invaluable, Drouot, Julien's, Rago/Wright, Ketterer, Lempertz, Van Ham, Artsy, and more)
+- Scrapes 15 auction houses and platforms (Sotheby's, Christie's, Phillips, Bonhams, Invaluable, Drouot, Julien's, Rago/Wright, Ketterer, Lempertz, Van Ham, Catawiki, Artsy, and more)
 - Deduplicates across sources — direct house scrapers take priority over Artsy mirrors
 - Sends a responsive HTML email via [Resend](https://resend.com)
 - Publishes all current lots to a filterable website on GitHub Pages
@@ -13,7 +13,7 @@ Tracks upcoming auction lots and dealer listings for a list of artists. Sends a 
 
 `https://<your-github-username>.github.io/auction-watch/`
 
-Rebuilt daily. Filter by artist, sort by date or house. Like individual lots (saved in your browser). No login required.
+Rebuilt daily. Filter by artist, sort by date or house. Like individual lots (saved in your browser). Manage tracked artists directly from the website with Artsy autocomplete. No login required.
 
 **One-time setup:** Repo Settings → Pages → Source: `gh-pages` branch, `/ (root)`.
 
@@ -74,12 +74,29 @@ uv run auction-watch-sync
 
 `artists.yml` — edit freely. Each entry needs a `name` and an Artsy `slug` (the path segment from `artsy.net/artist/<slug>`). The `bio` field is optional and ignored by scrapers.
 
+You can also add free-text `search_terms` that are sent to text-based scrapers (everything except Artsy). Useful for partial names, alternate spellings, or non-artist searches.
+
 ```yaml
 artists:
   - name: "Cindy Sherman"
     slug: cindy-sherman
     bio: "American, b. 1954"
+
+search_terms:
+  - "Bauhaus furniture"
+  - "Memphis Milano"
 ```
+
+### Website artist management
+
+When `ADD_ARTIST_TOKEN` is set (a GitHub token with `contents:write` scope), the website shows **+ Add** and **Manage** buttons:
+
+- **+ Add**: Type to search Artsy's artist database with autocomplete. Click a result to add it to `artists.yml` via the GitHub Contents API. You can also add a free-text search term from the bottom of the dropdown.
+- **Manage**: Shows all tracked artists and search terms with delete buttons. Removals commit directly to `artists.yml`.
+
+### Email favourites
+
+Each lot in the email digest includes a heart link. Clicking it opens the website, auto-likes the lot (saved in localStorage), scrolls to it, and briefly highlights it.
 
 ## Local setup
 
@@ -113,5 +130,6 @@ uv run auction-watch
 | Ketterer | HTML scrape |
 | Lempertz | HTML scrape (artist-index pages) |
 | Van Ham | HTML scrape |
+| Catawiki | Playwright browser scrape |
 | Dorotheum | Stub (Cloudflare blocks) |
 | 1stDibs | Stub (buy-now marketplace) |
