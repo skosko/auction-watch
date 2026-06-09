@@ -18,6 +18,14 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Restore seen-lots state
+        id: seen-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: seen_lots.json
+          key: seen-lots-${{ github.run_id }}
+          restore-keys: seen-lots-
+
       - name: Install dependencies
         run: uv sync
 
@@ -29,7 +37,21 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
           PROXY_URL: ${{ secrets.PROXY_URL }}
-        run: uv run auction-watch
+        run: |
+          # On first run (no cache) skip sending so the run only seeds the
+          # seen-lots baseline. Next run will diff correctly.
+          if [ ! -f seen_lots.json ]; then
+            echo "No seen-lots cache — seeding baseline without sending email"
+            unset RESEND_API_KEY
+          fi
+          uv run auction-watch
+
+      - name: Save seen-lots state
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: seen_lots.json
+          key: seen-lots-${{ github.run_id }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
