@@ -428,6 +428,9 @@ artists:
   - name: "Guy Billout"
     slug: guy-billout
     bio: "French, born 1941, Decize, France, based in New York, NY, USA"
+  - name: "Alessandro Florio"
+    slug: alessandro-florio
+    bio: "Italian"
 
 search_terms:
   - "Name Waffe Stern"
