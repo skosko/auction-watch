@@ -431,6 +431,9 @@ artists:
   - name: "Alessandro Florio"
     slug: alessandro-florio
     bio: "Italian"
+  - name: "Frank Kozik"
+    slug: frank-kozik
+    bio: "American, born 1962, Madrid, Spain, based in San Francisco, CA, USA"
 
 search_terms:
   - "Name Waffe Stern"
