@@ -434,6 +434,9 @@ artists:
   - name: "Frank Kozik"
     slug: frank-kozik
     bio: "American, born 1962, Madrid, Spain, based in San Francisco, CA, USA"
+  - name: "Mario Dilitz"
+    slug: mario-dilitz
+    bio: "Austrian, born 1973, Axams, Austria, based in Axams, Austria"
 
 search_terms:
   - "Name Waffe Stern"
