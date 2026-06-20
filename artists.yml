@@ -437,6 +437,9 @@ artists:
   - name: "Franz Gertsch"
     slug: franz-gertsch
     bio: "Swiss, born 1930, Mörigen, Switzerland, based in Rüschegg, Switzerland"
+  - name: "Rineke Dijkstra"
+    slug: rineke-dijkstra
+    bio: "Dutch, born 1959, Sittard, Netherlands, based in Amsterdam, Netherlands"
 
 search_terms:
   - "Name Waffe Stern"
