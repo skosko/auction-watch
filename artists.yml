@@ -434,6 +434,9 @@ artists:
   - name: "Bettina von Arnim"
     slug: bettina-von-arnim
     bio: "German, born 1940, Zernikow, Großwoltersdorf, Germany, based in France"
+  - name: "Franz Gertsch"
+    slug: franz-gertsch
+    bio: "Swiss, born 1930, Mörigen, Switzerland, based in Rüschegg, Switzerland"
 
 search_terms:
   - "Name Waffe Stern"
