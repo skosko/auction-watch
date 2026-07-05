@@ -440,6 +440,8 @@ artists:
   - name: "Rineke Dijkstra"
     slug: rineke-dijkstra
     bio: "Dutch, born 1959, Sittard, Netherlands, based in Amsterdam, Netherlands"
+  - name: "Ulrich Hachulla"
+    slug: ulrich-hachulla
 
 search_terms:
   - "Name Waffe Stern"
