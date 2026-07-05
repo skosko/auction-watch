@@ -442,6 +442,8 @@ artists:
     bio: "Dutch, born 1959, Sittard, Netherlands, based in Amsterdam, Netherlands"
   - name: "Ulrich Hachulla"
     slug: ulrich-hachulla
+  - name: "Hermann Reimer"
+    slug: hermann-reimer
 
 search_terms:
   - "Name Waffe Stern"
