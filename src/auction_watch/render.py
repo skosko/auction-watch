@@ -1,3 +1,5 @@
+import json
+
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,6 +34,16 @@ def _sort_key(lot: Lot):
     if lot.close_date is not None:
         return (0, lot.close_date, lot.artist)
     return (1, datetime.max.replace(tzinfo=timezone.utc), lot.artist)
+
+
+def render_json(lots: list[Lot]) -> str:
+    return json.dumps(
+        {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "lots": [lot.model_dump(mode="json") for lot in sorted(lots, key=_sort_key)],
+        },
+        ensure_ascii=False,
+    )
 
 
 def render_digest(

@@ -1,7 +1,12 @@
 const REPO = "skosko/auction-watch";
-const FILE = "artists.yml";
-const GITHUB_API = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+const GITHUB_API = "https://api.github.com/repos/" + REPO + "/contents/";
 const ALLOWED_ORIGIN = "https://skosko.github.io";
+
+const FILE_ROUTES = {
+  "/file": "artists.yml",
+  "/file/artists": "artists.yml",
+  "/file/favourites": "favourites.json",
+};
 
 function corsHeaders(origin) {
   return {
@@ -21,14 +26,18 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
-    if (url.pathname !== "/file") {
+    const file = FILE_ROUTES[url.pathname];
+    if (!file) {
       return new Response("Not found", { status: 404 });
     }
 
+    // Block cross-origin browser requests from unknown origins.
+    // Native apps (iOS) send no Origin header, so origin will be empty — allow those.
     if (origin && origin !== ALLOWED_ORIGIN) {
       return new Response("Forbidden", { status: 403 });
     }
 
+    const ghUrl = GITHUB_API + file;
     const ghHeaders = {
       Authorization: `Bearer ${env.GITHUB_TOKEN}`,
       Accept: "application/vnd.github+json",
@@ -38,10 +47,10 @@ export default {
     let ghResponse;
 
     if (request.method === "GET") {
-      ghResponse = await fetch(GITHUB_API, { headers: ghHeaders });
+      ghResponse = await fetch(ghUrl, { headers: ghHeaders });
     } else if (request.method === "PUT") {
       const body = await request.json();
-      ghResponse = await fetch(GITHUB_API, {
+      ghResponse = await fetch(ghUrl, {
         method: "PUT",
         headers: { ...ghHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({

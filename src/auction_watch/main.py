@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from .artists import Artist, load_artists, load_search_terms
 from .mailer import cat_image_url, send_digest
 from .models import Lot
-from .render import render_digest, render_web
+from .render import render_digest, render_json, render_web
 from .scrapers import (
     artsy,
     bonhams,
@@ -279,12 +279,25 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
 IMAGE_CHECK_CONCURRENCY = 20
 IMAGE_CHECK_TIMEOUT = 5.0
 
+# CDN hosts known to block non-browser requests (Cloudflare bot protection).
+# Skip HEAD checks for these — they always fail from a server context.
+_BLOCKED_IMAGE_HOSTS = {"image.invaluable.com"}
+
 
 async def _validate_images(lots: list[Lot]) -> None:
     """HEAD-check image URLs and null out broken ones."""
-    urls = {str(lot.image_url) for lot in lots if lot.image_url}
-    if not urls:
-        return
+    blocked: set[str] = set()
+    check_urls: set[str] = set()
+    for lot in lots:
+        if not lot.image_url:
+            continue
+        url = str(lot.image_url)
+        host = url.split("/")[2] if url.startswith("http") else ""
+        if host in _BLOCKED_IMAGE_HOSTS:
+            blocked.add(url)
+        else:
+            check_urls.add(url)
+
     sem = asyncio.Semaphore(IMAGE_CHECK_CONCURRENCY)
     bad: set[str] = set()
 
@@ -297,14 +310,56 @@ async def _validate_images(lots: list[Lot]) -> None:
             except Exception:
                 bad.add(url)
 
-    async with httpx.AsyncClient() as client:
-        await asyncio.gather(*(_check(client, u) for u in urls))
+    if check_urls:
+        async with httpx.AsyncClient() as client:
+            await asyncio.gather(*(_check(client, u) for u in check_urls))
 
-    if bad:
+    all_bad = bad | blocked
+    if all_bad:
         for lot in lots:
-            if lot.image_url and str(lot.image_url) in bad:
+            if lot.image_url and str(lot.image_url) in all_bad:
                 lot.image_url = None
-        log.info("Dropped %d broken image URL(s)", len(bad))
+        log.info(
+            "Dropped %d broken image URL(s) (%d blocked CDN, %d failed HEAD)",
+            len(all_bad), len(blocked), len(bad),
+        )
+
+
+def _build_image_fallbacks(lots: list[Lot]) -> dict[tuple, str]:
+    """Build a map of (artist_norm, date) → image_url from lots with working images.
+
+    Used to recover images for lots whose CDN is blocked (e.g. Invaluable)
+    by borrowing the image from a duplicate lot on another source (e.g. Artsy).
+    Sources known to serve images reliably are preferred.
+    """
+    fallbacks: dict[tuple, str] = {}
+    # Prefer Artsy (CloudFront CDN, always accessible), then others
+    for lot in lots:
+        if not lot.image_url or lot.close_date is None:
+            continue
+        url = str(lot.image_url)
+        host = url.split("/")[2] if url.startswith("http") else ""
+        if host in _BLOCKED_IMAGE_HOSTS:
+            continue
+        key = (_norm(lot.artist), lot.close_date.date())
+        # First writer wins — Artsy lots tend to come early in the list
+        if key not in fallbacks:
+            fallbacks[key] = url
+    return fallbacks
+
+
+def _apply_image_fallbacks(lots: list[Lot], fallbacks: dict[tuple, str]) -> int:
+    """Fill in missing image_url from the fallback map. Returns count of recoveries."""
+    recovered = 0
+    for lot in lots:
+        if lot.image_url or lot.close_date is None:
+            continue
+        key = (_norm(lot.artist), lot.close_date.date())
+        url = fallbacks.get(key)
+        if url:
+            lot.image_url = url
+            recovered += 1
+    return recovered
 
 
 _SEEN_FILE = Path("seen_lots.json")
@@ -332,9 +387,14 @@ def cli():
 
     if os.environ.get("EMPTY_PREVIEW") == "1":
         lots: list[Lot] = []
+        image_fallbacks: dict[tuple, str] = {}
     else:
         all_lots, eur_rates = asyncio.run(_gather_lots(scraper_input))
         in_window = _within_window(all_lots, LOOKAHEAD_DAYS)
+        # Build fallback image map BEFORE dedup discards duplicates (e.g. Artsy
+        # lots that match an Invaluable lot). This lets us recover working images
+        # for lots whose CDN is blocked.
+        image_fallbacks = _build_image_fallbacks(in_window)
         lots = _dedupe(in_window)
         _apply_eur_prices(lots, eur_rates)
         log.info(
@@ -376,8 +436,18 @@ def cli():
     web_out.write_text(web, encoding="utf-8")
     log.info("Wrote %s", web_out.resolve())
 
+    json_out = Path("_site/lots.json")
+    json_out.write_text(render_json(lots), encoding="utf-8")
+    log.info("Wrote %s", json_out.resolve())
+
     # Validate image URLs, then render the email (broken images removed).
     asyncio.run(_validate_images(lots))
+
+    # Recover images for lots with blocked CDNs using fallback sources.
+    if image_fallbacks:
+        recovered = _apply_image_fallbacks(lots, image_fallbacks)
+        if recovered:
+            log.info("Recovered %d image(s) from fallback sources", recovered)
 
     cat = cat_image_url() if not new_lots else None
     html = render_digest(new_lots, cat_image_url=cat, artist_slugs=artist_slugs, site_url=site_url)

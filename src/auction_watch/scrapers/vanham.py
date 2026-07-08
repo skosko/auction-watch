@@ -22,7 +22,7 @@ import logging
 import re
 from datetime import datetime, timedelta, timezone
 
-import httpx
+from curl_cffi.requests import AsyncSession
 
 from ..artists import Artist
 from ..models import Lot
@@ -70,9 +70,11 @@ def _parse_german_date(s: str) -> datetime | None:
         return None
 
 
-async def _fetch(client: httpx.AsyncClient, url: str, **kwargs) -> str | None:
+async def _fetch(session: AsyncSession, url: str, **kwargs) -> str | None:
     try:
-        r = await client.get(url, headers=HEADERS, timeout=20.0, **kwargs)
+        r = await session.get(
+            url, headers=HEADERS, timeout=20.0, impersonate="chrome124", **kwargs
+        )
         r.raise_for_status()
         return r.text
     except Exception as e:
@@ -155,10 +157,10 @@ def _parse_search_page(html: str, artist_norm: str, artist_display: str) -> list
 
 
 async def _enrich_lot(
-    client: httpx.AsyncClient, raw: dict
+    session: AsyncSession, raw: dict
 ) -> Lot | None:
     """Fetch detail page; extract expiration_time + sale name."""
-    html = await _fetch(client, raw["url"])
+    html = await _fetch(session, raw["url"])
     if not html:
         return None
 
@@ -213,43 +215,45 @@ async def _enrich_lot(
 
 
 async def _search_artist(
-    client: httpx.AsyncClient, artist: Artist
+    session: AsyncSession, artist: Artist
 ) -> list[dict]:
     html = await _fetch(
-        client, SEARCH_URL, params={"search_title": artist.name, "search_closed": "n"}
+        session, SEARCH_URL, params={"search_title": artist.name, "search_closed": "n"}
     )
     if not html:
         return []
     return _parse_search_page(html, normalize(artist.name), artist.name)
 
 
-async def collect(client: httpx.AsyncClient, artists: list[Artist]) -> list[Lot]:
+async def collect(client, artists: list[Artist]) -> list[Lot]:
     sem_search = asyncio.Semaphore(CONCURRENCY_SEARCH)
     sem_detail = asyncio.Semaphore(CONCURRENCY_DETAIL)
 
-    async def _one_search(a: Artist) -> list[dict]:
-        async with sem_search:
-            return await _search_artist(client, a)
+    async with AsyncSession() as session:
+        async def _one_search(a: Artist) -> list[dict]:
+            async with sem_search:
+                return await _search_artist(session, a)
 
-    all_raws_nested = await asyncio.gather(*(_one_search(a) for a in artists))
+        all_raws_nested = await asyncio.gather(*(_one_search(a) for a in artists))
 
-    # Flatten and deduplicate by lot URL
-    seen_urls: set[str] = set()
-    unique_raws = []
-    for raws in all_raws_nested:
-        for raw in raws:
-            if raw["url"] not in seen_urls:
-                seen_urls.add(raw["url"])
-                unique_raws.append(raw)
+        # Flatten and deduplicate by lot URL
+        seen_urls: set[str] = set()
+        unique_raws = []
+        for raws in all_raws_nested:
+            for raw in raws:
+                if raw["url"] not in seen_urls:
+                    seen_urls.add(raw["url"])
+                    unique_raws.append(raw)
 
-    if not unique_raws:
-        return []
+        if not unique_raws:
+            return []
 
-    async def _one_detail(raw: dict) -> Lot | None:
-        async with sem_detail:
-            return await _enrich_lot(client, raw)
+        async def _one_detail(raw: dict) -> Lot | None:
+            async with sem_detail:
+                return await _enrich_lot(session, raw)
 
-    lot_results = await asyncio.gather(*(_one_detail(r) for r in unique_raws))
+        lot_results = await asyncio.gather(*(_one_detail(r) for r in unique_raws))
+
     lots = [lot for lot in lot_results if lot is not None]
 
     if lots:
