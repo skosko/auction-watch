@@ -441,6 +441,9 @@ artists:
     slug: ulrich-hachulla
   - name: "Hermann Reimer"
     slug: hermann-reimer
+  - name: "Anna Weyant"
+    slug: anna-weyant
+    bio: "American, born 1995, Calgary, AB, Canada, based in New York, USA"
 
 search_terms:
   - "Name Waffe Stern"
