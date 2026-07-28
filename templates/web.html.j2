@@ -738,6 +738,7 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
   function doAddArtist(name, slug, bio) {
     addMsg.textContent = 'Adding\u2026';
     ghGetFile().then(function (file) {
+      if (!file || !file.content) throw new Error('Error ' + (file && file.status ? file.status : 'reading file'));
       var yaml = decodeGhContent(file);
       if (yaml.indexOf('"' + name + '"') >= 0) { addMsg.textContent = name + ' is already tracked'; return; }
       var updated = yamlAddArtist(yaml, name, slug, bio);
@@ -747,12 +748,13 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
           appendManageItem('manage-artists', name, 'artist');
         } else { addMsg.textContent = 'Error ' + r.status; }
       });
-    }).catch(function () { addMsg.textContent = 'Network error'; });
+    }).catch(function (e) { addMsg.textContent = e && e.message ? e.message : 'Network error'; });
   }
 
   function doAddSearchTerm(term) {
     addMsg.textContent = 'Adding\u2026';
     ghGetFile().then(function (file) {
+      if (!file || !file.content) throw new Error('Error ' + (file && file.status ? file.status : 'reading file'));
       var yaml = decodeGhContent(file);
       if (yaml.indexOf('"' + term + '"') >= 0) { addMsg.textContent = term + ' is already tracked'; return; }
       var updated = yamlAddSearchTerm(yaml, term);
@@ -762,11 +764,13 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
           appendManageItem('manage-terms', term, 'term');
         } else { addMsg.textContent = 'Error ' + r.status; }
       });
-    }).catch(function () { addMsg.textContent = 'Network error'; });
+    }).catch(function (e) { addMsg.textContent = e && e.message ? e.message : 'Network error'; });
   }
 
   function doRemove(name, type) {
+    addMsg.textContent = 'Removing…';
     ghGetFile().then(function (file) {
+      if (!file || !file.content) throw new Error('Error ' + (file && file.status ? file.status : 'reading file'));
       var yaml = decodeGhContent(file);
       var updated = type === 'artist' ? yamlRemoveArtist(yaml, name) : yamlRemoveSearchTerm(yaml, name);
       return ghPutFile(updated, file.sha, 'Remove ' + type + ': ' + name).then(function (r) {
@@ -775,9 +779,10 @@ h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
           container.querySelectorAll('.manage-item').forEach(function (item) {
             if (item.dataset.name === name) item.remove();
           });
-        }
+          addMsg.textContent = '✓ ' + name + ' removed';
+        } else { addMsg.textContent = 'Error ' + r.status; }
       });
-    });
+    }).catch(function (e) { addMsg.textContent = e && e.message ? e.message : 'Network error'; });
   }
 
   function appendManageItem(containerId, name, type) {
