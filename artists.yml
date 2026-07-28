@@ -444,6 +444,9 @@ artists:
   - name: "Anna Weyant"
     slug: anna-weyant
     bio: "American, born 1995, Calgary, AB, Canada, based in New York, USA"
+  - name: "Kawase Hasui"
+    slug: kawase-hasui
+    bio: "Japanese, 1883  - 1957, Japan, based in Japan"
 
 search_terms:
   - "Name Waffe Stern"
