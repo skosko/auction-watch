@@ -450,6 +450,9 @@ artists:
   - name: "Francisco de Zurbarán"
     slug: francisco-de-zurbaran
     bio: "Spanish, 1598-1664, Fuente de Cantos, Spain, based in Madrid, Spain"
+  - name: "Ralph Goings"
+    slug: ralph-goings
+    bio: "American, 1928-2016, Corning, CA, USA"
 
 search_terms:
   - "Name Waffe Stern"
