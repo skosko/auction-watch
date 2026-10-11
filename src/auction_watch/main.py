@@ -284,7 +284,7 @@ IMAGE_CHECK_TIMEOUT = 5.0
 _BLOCKED_IMAGE_HOSTS = {"image.invaluable.com"}
 
 
-async def _validate_images(lots: list[Lot]) -> None:
+async def _validate_images(lots: list[Lot]) -> set[str]:
     """HEAD-check image URLs and null out broken ones."""
     blocked: set[str] = set()
     check_urls: set[str] = set()
@@ -323,17 +323,27 @@ async def _validate_images(lots: list[Lot]) -> None:
             "Dropped %d broken image URL(s) (%d blocked CDN, %d failed HEAD)",
             len(all_bad), len(blocked), len(bad),
         )
+    return all_bad
 
 
-def _build_image_fallbacks(lots: list[Lot]) -> dict[tuple, str]:
-    """Build a map of (artist_norm, date) → image_url from lots with working images.
+def _titles_match(a: str, b: str) -> bool:
+    """Prefix-aware title match (same rule as the Artsy dedup pass)."""
+    a, b = _norm(a), _norm(b)
+    if not a or not b:
+        return False
+    short, long_ = (a, b) if len(a) <= len(b) else (b, a)
+    return len(short) >= 8 and long_.startswith(short)
+
+
+def _build_image_fallbacks(lots: list[Lot]) -> dict[tuple, list[tuple[str, str, str]]]:
+    """Build a map of (artist_norm, date) → [(source, title, image_url), ...].
 
     Used to recover images for lots whose CDN is blocked (e.g. Invaluable)
     by borrowing the image from a duplicate lot on another source (e.g. Artsy).
-    Sources known to serve images reliably are preferred.
+    Every candidate is kept (not just the first) so the lookup can pick the
+    image for the *same artwork*, not just the same artist on the same day.
     """
-    fallbacks: dict[tuple, str] = {}
-    # Prefer Artsy (CloudFront CDN, always accessible), then others
+    fallbacks: dict[tuple, list[tuple[str, str, str]]] = {}
     for lot in lots:
         if not lot.image_url or lot.close_date is None:
             continue
@@ -342,23 +352,46 @@ def _build_image_fallbacks(lots: list[Lot]) -> dict[tuple, str]:
         if host in _BLOCKED_IMAGE_HOSTS:
             continue
         key = (_norm(lot.artist), lot.close_date.date())
-        # First writer wins — Artsy lots tend to come early in the list
-        if key not in fallbacks:
-            fallbacks[key] = url
+        fallbacks.setdefault(key, []).append((lot.source, lot.title, url))
     return fallbacks
 
 
-def _apply_image_fallbacks(lots: list[Lot], fallbacks: dict[tuple, str]) -> int:
-    """Fill in missing image_url from the fallback map. Returns count of recoveries."""
+def _apply_image_fallbacks(
+    lots: list[Lot],
+    fallbacks: dict[tuple, list[tuple[str, str, str]]],
+    bad_urls: set[str] | None = None,
+) -> int:
+    """Fill in missing image_url from the fallback map. Returns count of recoveries.
+
+    Only borrows an image when it unambiguously belongs to the same artwork:
+      1. a lot from another source whose title matches, or
+      2. if no title matches (titles can differ by language), the artist has
+         exactly one distinct image from other sources that day.
+    When an artist has several lots in the same sale and titles don't match,
+    the lot is left without an image rather than showing someone else's.
+    """
+    bad_urls = bad_urls or set()
     recovered = 0
     for lot in lots:
         if lot.image_url or lot.close_date is None:
             continue
         key = (_norm(lot.artist), lot.close_date.date())
-        url = fallbacks.get(key)
-        if url:
-            lot.image_url = url
-            recovered += 1
+        candidates = [
+            (src, title, url)
+            for src, title, url in fallbacks.get(key, [])
+            if src != lot.source and url not in bad_urls
+        ]
+        if not candidates:
+            continue
+        title_hits = {url for _, title, url in candidates if _titles_match(lot.title, title)}
+        if len(title_hits) == 1:
+            url = title_hits.pop()
+        elif not title_hits and len({url for _, _, url in candidates}) == 1:
+            url = candidates[0][2]
+        else:
+            continue
+        lot.image_url = url
+        recovered += 1
     return recovered
 
 
@@ -387,7 +420,7 @@ def cli():
 
     if os.environ.get("EMPTY_PREVIEW") == "1":
         lots: list[Lot] = []
-        image_fallbacks: dict[tuple, str] = {}
+        image_fallbacks: dict[tuple, list[tuple[str, str, str]]] = {}
     else:
         all_lots, eur_rates = asyncio.run(_gather_lots(scraper_input))
         in_window = _within_window(all_lots, LOOKAHEAD_DAYS)
@@ -441,11 +474,11 @@ def cli():
     log.info("Wrote %s", json_out.resolve())
 
     # Validate image URLs, then render the email (broken images removed).
-    asyncio.run(_validate_images(lots))
+    bad_image_urls = asyncio.run(_validate_images(lots))
 
     # Recover images for lots with blocked CDNs using fallback sources.
     if image_fallbacks:
-        recovered = _apply_image_fallbacks(lots, image_fallbacks)
+        recovered = _apply_image_fallbacks(lots, image_fallbacks, bad_image_urls)
         if recovered:
             log.info("Recovered %d image(s) from fallback sources", recovered)
 
