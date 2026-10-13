@@ -32,7 +32,8 @@ ALGOLIA_INDEX = "upcoming_lots_prod"
 ALGOLIA_URL = (
     f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
 )
-IMAGE_BASE = "https://image.invaluable.com/hermes/"
+# Lot photos live under /housePhotos/ (the /hermes/ prefix returns NoSuchKey).
+IMAGE_BASE = "https://image.invaluable.com/housePhotos/"
 
 CONCURRENCY = 10
 

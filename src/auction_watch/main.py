@@ -279,9 +279,10 @@ def _dedupe(lots: list[Lot]) -> list[Lot]:
 IMAGE_CHECK_CONCURRENCY = 20
 IMAGE_CHECK_TIMEOUT = 5.0
 
-# CDN hosts known to block non-browser requests (Cloudflare bot protection).
-# Skip HEAD checks for these — they always fail from a server context.
-_BLOCKED_IMAGE_HOSTS = {"image.invaluable.com"}
+# CDN hosts whose images never load in email clients; their URLs are dropped
+# without a HEAD check. (Invaluable used to be listed here, but its images
+# were only failing because the scraper built URLs with the wrong path.)
+_BLOCKED_IMAGE_HOSTS: set[str] = set()
 # HEAD responses that prove an image is gone. Anything else (403, 405, 429,
 # 5xx, timeouts) is treated as inconclusive and the image is kept.
 _DEFINITELY_BROKEN = {404, 410}
