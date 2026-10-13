@@ -282,6 +282,13 @@ IMAGE_CHECK_TIMEOUT = 5.0
 # CDN hosts known to block non-browser requests (Cloudflare bot protection).
 # Skip HEAD checks for these — they always fail from a server context.
 _BLOCKED_IMAGE_HOSTS = {"image.invaluable.com"}
+# HEAD responses that prove an image is gone. Anything else (403, 405, 429,
+# 5xx, timeouts) is treated as inconclusive and the image is kept.
+_DEFINITELY_BROKEN = {404, 410}
+_BROWSER_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/128.0 Safari/537.36"
+)
 
 
 async def _validate_images(lots: list[Lot]) -> set[str]:
@@ -300,18 +307,25 @@ async def _validate_images(lots: list[Lot]) -> set[str]:
 
     sem = asyncio.Semaphore(IMAGE_CHECK_CONCURRENCY)
     bad: set[str] = set()
+    unknown: set[str] = set()
 
     async def _check(client: httpx.AsyncClient, url: str) -> None:
+        # Only drop an image when the server says it definitively doesn't exist.
+        # CDNs often answer datacenter IPs (GitHub Actions) or HEAD requests with
+        # 403/405/429/5xx or time out, even though the image loads fine in an
+        # email client. Those cases are "unknown", so the image is kept.
         async with sem:
             try:
                 r = await client.head(url, timeout=IMAGE_CHECK_TIMEOUT, follow_redirects=True)
-                if r.status_code >= 400:
+                if r.status_code in _DEFINITELY_BROKEN:
                     bad.add(url)
+                elif r.status_code >= 400:
+                    unknown.add(url)
             except Exception:
-                bad.add(url)
+                unknown.add(url)
 
     if check_urls:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(headers={"User-Agent": _BROWSER_UA}) as client:
             await asyncio.gather(*(_check(client, u) for u in check_urls))
 
     all_bad = bad | blocked
@@ -320,9 +334,11 @@ async def _validate_images(lots: list[Lot]) -> set[str]:
             if lot.image_url and str(lot.image_url) in all_bad:
                 lot.image_url = None
         log.info(
-            "Dropped %d broken image URL(s) (%d blocked CDN, %d failed HEAD)",
+            "Dropped %d broken image URL(s) (%d blocked CDN, %d not found)",
             len(all_bad), len(blocked), len(bad),
         )
+    if unknown:
+        log.info("Kept %d image URL(s) whose HEAD check was inconclusive", len(unknown))
     return all_bad
 
 
