@@ -7,20 +7,20 @@ on:
 
 jobs:
   digest:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Playwright 1.60 has no Ubuntu 26.04 support
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v4
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
 
       - name: Restore seen-lots state
         id: seen-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: seen_lots.json
           key: seen-lots-${{ github.run_id }}
@@ -47,14 +47,14 @@ jobs:
           uv run auction-watch
 
       - name: Save seen-lots state
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         if: always()
         with:
           path: seen_lots.json
           key: seen-lots-${{ github.run_id }}
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _site
